@@ -6,5 +6,5 @@ const PORT = 3000
 server.use('/api/transactions', transactionRouter)
 
 server.listen(PORT, () => {
-    console.log(`Server running on port 20 ${PORT}!`)
+    console.log(`Server running on port : ${PORT}!`)
 })

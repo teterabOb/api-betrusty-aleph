@@ -5,14 +5,15 @@ export interface Item {
   owner: string;
 }
 
-export interface Signature {
-  price: ethers.BigNumber;
+export interface SignatureMarketplace {
+  price: string;
   nftContractId: number;
   signature: string;
 }
 
 let itemsForSale: Array<Item> = Array<Item>();
-let listOfSignatures: Array<Signature> = Array<Signature>();
+let listOfSignatures: Array<SignatureMarketplace> =
+  Array<SignatureMarketplace>();
 
 // Retorna la Lista de los Items en Venta
 export function getListOfAvailableItems(): Item[] {
@@ -20,7 +21,7 @@ export function getListOfAvailableItems(): Item[] {
 }
 
 // Retorna la Lista de las Firmas
-export function getListOfSignatures(): Signature[] {
+export function getListOfSignatures(): SignatureMarketplace[] {
   return listOfSignatures;
 }
 
@@ -28,6 +29,6 @@ export function addItemToList(item: Item) {
   itemsForSale.push(item);
 }
 
-export function addSignatureToList(signature: Signature) {
+export function addSignatureToList(signature: SignatureMarketplace) {
   listOfSignatures.push(signature);
 }

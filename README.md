@@ -23,4 +23,32 @@ Para ejecutar la API debes utilizar el siguiente comando
 
 ```sh
 npm run dev
+```
+
+Mint ERC20
+
+```sh
+{
+    "address": "0x1c71Ce6C4d052723010a0C7320DE890fDc1622b6",
+    "amount": "10"
+}
+```
+
+Mint NFT
+
+```sh
+No se envía nada. Tomará la cuenta de la private key de la variable OWNER_PRIVATE_KEY del archivo .env como el owner.
+```
+
+Make Offer
+
+```sh
+{
+    "auctionData": {
+        "nftContracAddress": string,
+        "ERC20CurrencyAddress": string,
+        "nftContractId": number,
+        "erc20CurrencyAmount": "0.1"
+    }
+}
   ```

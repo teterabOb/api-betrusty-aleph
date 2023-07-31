@@ -41,7 +41,7 @@ npm run dev
 
 Para realizar un mint de tokens ERC20, utiliza el siguiente formato en la solicitud:
 
-Endpoint - GET
+Endpoint - POST
 
 ```sh
 http://localhost:3000/api/transactions/mint-erc20
@@ -51,10 +51,66 @@ Payload request
 
 ```json
 {
-    "address": "0x1c71Ce6C4d052723010a0C7320DE890fDc1622b6",
-    "amount": "10"
+    "address": "address",
+    "amount": "monto - ejemplo: 0.1"
 }
 ```
+
+## Mint de NFT ERC721
+
+No es necesario enviar información en la solicitud para realizar un mint de NFT. La API tomará la cuenta de la llave privada especificada en la variable OWNER_PRIVATE_KEY del archivo .env como el owner del NFT.
+
+Endpoint - POST
+
+```sh
+http://localhost:3000/api/transactions/mint-nft
+```
+
+### Realizar una oferta (Buyer/Bidder)
+
+Para realizar una oferta, utiliza el siguiente formato en la solicitud:
+
+Endpoint - POST
+
+```sh
+http://localhost:3000/api/transactions/make-offer
+```
+### NOTA: Es importante tener en cuenta que, aunque el objeto "auctionData" incluye los campos "nftContracAddress" y "ERC20CurrencyAddress", la API en realidad utiliza las variables de entorno configuradas previamente en el archivo .env . Se optó por desarrollar la API de esta manera para ofrecer flexibilidad en futuras modificaciones -en caso de que se requiera-. De esta forma, con cambios mínimos, el contrato inteligente Marketplace puede transaccionar cualquier Token ERC721 por Token ERC20.
+
+Para realizar una oferta, utiliza el siguiente formato en la solicitud:
+
+```json
+{
+    "auctionData": {
+        "nftContracAddress": "dirección del contrato NFT",
+        "ERC20CurrencyAddress": "dirección del contrato ERC20",
+        "nftContractId": "ID del contrato NFT",
+        "erc20CurrencyAmount": "0.1"
+    }
+}
+```
+
+### Aceptar una oferta (Owner/Seller)
+
+Endpoint - POST
+
+```sh
+http://localhost:3000/api/transactions/accept-offer
+```
+
+Para realizar una oferta, utiliza el siguiente formato en la solicitud:
+
+```json
+{
+    "auctionData": {
+        "nftContracAddress": "dirección del contrato NFT",
+        "ERC20CurrencyAddress": "dirección del contrato ERC20",
+        "nftContractId": "ID del contrato NFT",
+        "erc20CurrencyAmount": "0.1"
+    }
+}
+```
+
 
 
 

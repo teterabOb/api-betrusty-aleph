@@ -78,7 +78,7 @@ export async function acceptOffer(auctionData: AuctionData): Promise<any> {
     //return receipt.transactionHash;
     return receipt;
   }else{
-    throw Error("The token ID sent is not for sale.")
+    throw Error("The token ID sent is not for sale or you're sending wrong values.")
   }
 }
 

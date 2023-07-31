@@ -89,6 +89,17 @@ Para realizar una oferta, utiliza el siguiente formato en la solicitud:
     }
 }
 ```
+### Listas las ofertas firmadas
+
+Endpoint - GET
+
+Para listar las ofertas firmadas puede ejecutar la siguiente solicitud. Recordar que estas firmas solo se almacenan en memoria. Pero de igual manera el owner ha dado permiso al Marketplace para transaccionar el item y el buyer ha autorizado al Marketplace para transaccionar los Tokens ERC20.
+
+```sh
+http://localhost:3000/api/transactions/list-of-signed
+```
+
+Para realizar una oferta, utiliza el siguiente formato en la solicitud:
 
 ### Aceptar una oferta (Owner/Seller)
 

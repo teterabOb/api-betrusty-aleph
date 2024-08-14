@@ -1,22 +1,19 @@
 import express from "express";
 import axios from "axios";
 import { Request, Response } from "express";
-import { GetGitHubEnv } from "../../../common/helpers/data/envData"
+import { GetGitHubEnv } from "../../../helpers/data/envData"
 
 const router = express.Router();
 
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
-router.get("/", (_req: Request, res: Response) => {
-  res.send("Welcome to the Protocol API!");
-});
 
-router.get("/auth/github", async (_req: Request, res: Response) => {
+router.get("/", async (_req, res) => {
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
   res.redirect(githubAuthUrl);
 });
 
-router.get("/auth/github/callback", async (req: Request, res: Response) => {
+router.get("/callback", async (req: Request, res: Response) => {
   const { code } = req.query;
 
   if (!code) {
@@ -24,7 +21,7 @@ router.get("/auth/github/callback", async (req: Request, res: Response) => {
   }
 
   try {
-    const tokenResponse = await axios.post("",
+    const tokenResponse = await axios.post("https://github.com/login/oauth/access_token",
       {
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
@@ -44,7 +41,9 @@ router.get("/auth/github/callback", async (req: Request, res: Response) => {
     const userData = userResponse.data;
     return res.json(userData);
   } catch (error) {
-    return res.status(500).send({ error: "Error duting Github Authentication" });
+    return res.status(500).send({ error: error });
   }
 });
+
+export default router;
 

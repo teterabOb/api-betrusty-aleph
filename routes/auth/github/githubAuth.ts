@@ -21,7 +21,8 @@ router.get("/callback", async (req: Request, res: Response) => {
   }
 
   try {
-    const tokenResponse = await axios.post("",
+    console.log("holaaa1")
+    const tokenResponse = await axios.post("https://github.com/login/oauth/access_token",
       {
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
@@ -33,15 +34,16 @@ router.get("/callback", async (req: Request, res: Response) => {
           Accept: "application/json",
         },
       })
-
+    console.log("holaaa")
     const { access_token } = tokenResponse.data;
+    console.log(access_token);
 
     const userResponse = await axios.get("https://api.github.com/user", { headers: { Authorization: `token ${access_token}` } });
 
     const userData = userResponse.data;
     return res.json(userData);
   } catch (error) {
-    return res.status(500).send({ error: "Error duting Github Authentication" });
+    return res.status(500).send({ error: error });
   }
 });
 

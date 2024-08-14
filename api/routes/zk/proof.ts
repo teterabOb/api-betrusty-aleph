@@ -1,5 +1,5 @@
 import express from "express"
-import {GenerateProof} from "../controller/zk/proofController"
+import {GenerateProof} from "../../controller/zk/proofController"
 
 const router = express.Router();
 

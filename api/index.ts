@@ -2,6 +2,7 @@ import server from './server'
 import { Request, Response, NextFunction} from "express"
 import transactionRouter from './routes/transactions'
 
+
 const PORT = 3003
 
 server.get('/', (req, res) => {
@@ -13,9 +14,9 @@ server.get('/', (req, res) => {
  })
     
 server.use('/api/transactions', transactionRouter)
-server.use('/api/auth/github/', transactionRouter)
-server.use('/api/auth/worldid/', transactionRouter)
-server.use('/api/auth/ml/', transactionRouter)
+//server.use('/api/auth/github/', transactionRouter)
+//server.use('/api/auth/worldid/', transactionRouter)
+//server.use('/api/auth/ml/', transactionRouter)
 
 //Middleware de manejo de errores
 server.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

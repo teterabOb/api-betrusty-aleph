@@ -21,16 +21,5 @@ router.post("/mint-nft", async (req, res) => {
   await mintNFT(req, res);
 });
 
-router.post("/mint-erc20", async (req, res) => {
-  await mintERC20(req, res);
-});
-
-router.post("/accept-offer", async (req, res) => {
-  await acceptOfferByOwner(req, res);
-});
-
-router.post("/make-offer", async (req, res) => {
-  await makeOfferByBidder(req, res);
-});
 
 export default router;

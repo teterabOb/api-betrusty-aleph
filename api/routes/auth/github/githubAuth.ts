@@ -1,12 +1,11 @@
 import express from "express";
 import axios from "axios";
 import { Request, Response } from "express";
+import { GetGitHubEnv } from "../../../common/helpers/data/envData"
 
 const router = express.Router();
 
-const CLIENT_ID = process.env.GITHUB_CLIENT_ID || "";
-const CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET || "";
-const REDIRECT_URI = process.env.GITHUB_REDIRECT_URI || "";
+const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
 router.get("/", (_req: Request, res: Response) => {
   res.send("Welcome to the Protocol API!");

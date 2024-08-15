@@ -11,11 +11,12 @@ router.get("/", async (_req: Request, res: Response) => {
         const result = await sql`CREATE TABLE 
         Github(
         ID_USER BIGINT, 
-        DID VARCHAR(50),
-        ACCESS_TOKEN VARCHAR(50), 
-        EXPIRES_IN VARCHAR(50), 
-        REFRESH_TOKEN VARCHAR(50), 
-        REFRESH_TOKEN_EXPIRES_IN VARCHAR(50), 
+        DID VARCHAR(150),
+        ACCESS_TOKEN VARCHAR(150), 
+        EXPIRES_IN VARCHAR(150), 
+        REFRESH_TOKEN VARCHAR(150), 
+        REFRESH_TOKEN_EXPIRES_IN VARCHAR(150), 
+        EMAIL VARCHAR(150),
         CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         UPDATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
         res.status(200).json(result);

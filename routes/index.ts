@@ -7,6 +7,6 @@ const routes = Router();
 
 routes.use("/github", github)
 routes.use("/user-table", userTable)
-routes.get('/', (req, res) => res.json(('express vercel boiler plate')));
+routes.get('/', (req, res) => res.json(('Express + TypeScript Server on Vercel')));
 
 export default routes;

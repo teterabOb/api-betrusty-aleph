@@ -19,7 +19,7 @@ router.get("/callback", async (req: Request, res: Response) => {
   const { code } = req.query;
 
   if (!code) {
-    return res.status(400).send("Code not found");
+    res.status(400).send("Code not found");
   }
 
   try {
@@ -36,13 +36,50 @@ router.get("/callback", async (req: Request, res: Response) => {
         },
       })
 
+    // 1. Validar si Usuario ya existe en la BDD
+    // 2. Si existe, actualizar los tokens
+    // 3. Si NO existe, guardar el token
+    // 4. Retornar la información del usuario
+
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse.data;
+    let email = "";
+    let userDataFromGithub: any;
 
-    await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in );
+    try {
+      const userResponse = await axios.get("https://api.github.com/user", { headers: { Authorization: `token ${access_token}` } });
+      const userData = userResponse.data;
+      email = userData.email;
+      userDataFromGithub = userResponse.data;
+      console.log("userDataFromGithub : ", userDataFromGithub);
+      
+      //res.json(userData);
+    } catch (error) {
+      res.status(500).send({ error: "Error obteniendo la info del User from Github" });
+    }
 
-    return res.redirect(`/user-info?access_token=${access_token}`);
+    console.log("****************");
+    console.log("email : ", email);
+
+    if(!email) { 
+      res.status(400).send("Email not found");
+    }
+
+    // Utilizaremos el Correo como ID para Github
+    const githubInfoDBB = await userDBB.getGithubByEmail(email.trim());
+    console.log(" githubindodbb :  ",githubInfoDBB);
+    //const userInDBB = await userDBB.getUser(githubInfoDBB[0].id_user);
+
+    try {
+      const result = await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      console.log(result);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error al insertar en la BDD" });
+    }
+    res.status(200).json(tokenResponse.data);
+    //return res.redirect(`/user-info?access_token=${access_token}`);
   } catch (error) {
-    return res.status(500).send({ error: error });
+    res.status(500).send({ error: error });
   }
 });
 
@@ -63,6 +100,7 @@ router.get("/user-info", async (req: Request, res: Response) => {
   }
 })
 
+// Refresh Token de acceso
 
 async function refreshAccessToken(refreshToken: string) {
   // Implementar la lógica para refrescar el token de acceso
@@ -81,7 +119,7 @@ async function refreshAccessToken(refreshToken: string) {
         },
       })
   } catch (error) {
-
+    console.error(error);
   }
 }
 

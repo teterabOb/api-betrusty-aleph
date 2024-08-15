@@ -2,7 +2,6 @@ import axios, { AxiosResponse } from "axios";
 import { Request, Response, Router } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
 import userDBB from "../../dbb/user";
-import { log } from "console";
 
 interface TokenResponse {
   access_token: string;

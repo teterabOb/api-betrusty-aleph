@@ -55,6 +55,10 @@ Como resultado obtenemos información relevante cómo:
 
 Con el `access_token` ya podemos acceder a la información del usuario. Sin embargo hay una información que es bastante relevante, este es el `refresh_token`. Que lo utilizamos para no repetir todo el proceso nuevamente. 
 
+*El `access_token` y el `refresh_token` debemos almacenarlos para luego refrescar el `access_token` para consultar la insformación del usuario sin necesidad de volver a realizar todo el proceso.*
+
+*Nota: * Cada vez que se refresca el token se debe almacenar nuevamente `access_token` y `refresh_token`.
+
 ### Accediendo a la Información
 
 Habiendo realizado los procesos anteriores ya podríamos acceder a la información del usuario. 

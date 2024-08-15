@@ -35,9 +35,11 @@ router.get("/callback", async (req: Request, res: Response) => {
         },
       })
 
-    const { access_token } = tokenResponse.data;
+    const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse.data;
 
     //await saveTokensToDB(accessToken, refreshToken);
+    console.log(access_token);
+    console.log(refresh_token)
 
     return res.redirect(`/user-info?access_token=${access_token}`);
   } catch (error) {
@@ -75,7 +77,7 @@ async function refreshAccessToken(refreshToken: string) {
         client_secret: CLIENT_SECRET,
         grant_type: "refresh_token",
         // The refresh token that you received when you generated a user access token.
-        refresh_token: "",
+        refresh_token: refreshToken,
       },
       {
         headers: {

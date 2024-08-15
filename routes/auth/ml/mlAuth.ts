@@ -37,9 +37,8 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const { access_token } = tokenResponse.data;
 
-    //const userResponse = await axios.get("https://api.github.com/user", { headers: { Authorization: `token ${access_token}` } });
+    //await saveTokensToDB(accessToken, refreshToken);
 
-    //const userData = userResponse.data;
     return res.redirect(`/user-info?access_token=${access_token}`);
   } catch (error) {
     return res.status(500).send({ error: error });
@@ -47,21 +46,46 @@ router.get("/callback", async (req: Request, res: Response) => {
 });
 
 // Obtiene la información del Usuario
-router.get("/user-info", async (req: Request, res: Response) => { 
-    const {access_token} = req.query;
+router.get("/user-info", async (req: Request, res: Response) => {
+  const { access_token } = req.query;
 
-    if(!access_token){
-        return res.status(400).send("Access token not found");
-    }
+  if (!access_token) {
+    return res.status(400).send("Access token not found");
+  }
 
-    try {
-        const userResponse = await axios.get("https://api.github.com/user", { headers: { Authorization: `token ${access_token}` } });
-        const userData = userResponse.data;
-        return res.json(userData);
-    } catch (error) {
-        return res.status(500).send({ error: error });
-    }
+  try {
+    const userResponse = await axios.get("https://api.github.com/user", { headers: { Authorization: `token ${access_token}` } });
+    const userData = userResponse.data;
+    return res.json(userData);
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
 })
+
+async function saveTokensToDB(accessToken: string, refreshToken: string) {
+  // Implementar la lógica para guardar los tokens en la base de datos
+}
+
+async function refreshAccessToken(refreshToken: string) {
+  // Implementar la lógica para refrescar el token de acceso
+  try {
+    const tokenResponse = await axios.post("https://github.com/login/oauth/access_token",
+      {
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        grant_type: "refresh_token",
+        // The refresh token that you received when you generated a user access token.
+        refresh_token: "",
+      },
+      {
+        headers: {
+          Accept: "application/json",
+        },
+      })
+  } catch (error) {
+
+  }
+}
 
 export default router;
 

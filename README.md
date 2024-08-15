@@ -45,3 +45,28 @@ Este callback realiza una solicitud `POST` al siguiente endpoint de `github`
 ```shell
 https://github.com/login/oauth/access_token
 ```
+
+Como resultado obtenemos información relevante cómo:
+
+1. `access_token`
+2. `expires_in`
+3. `refresh_token`
+4. `refresh_token_expires_in`
+
+Con el `access_token` ya podemos acceder a la información del usuario. Sin embargo hay una información que es bastante relevante, este es el `refresh_token`. Que lo utilizamos para no repetir todo el proceso nuevamente. 
+
+### Accediendo a la Información
+
+Habiendo realizado los procesos anteriores ya podríamos acceder a la información del usuario. 
+
+*Endpoint*
+
+```shell
+https://la-url-de-nuestra-api.com/github/user-info
+```
+
+*Ejemplo de solicitud*
+
+```shell
+curl -X GET "https://la-url-de-nuestra-api.com/github/user-info?access_token=YOUR_ACCESS_TOKEN"
+```

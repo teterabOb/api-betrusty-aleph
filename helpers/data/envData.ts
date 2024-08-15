@@ -10,14 +10,31 @@ export interface EnvironmentData {
     MarketplaceContractAddress: string;
 }
 
-export interface WorldIDEnv { }
+export interface WorldIDEnv {
+    WORLD_ID: string;
+    WORLD_SECRET: string;
+    WORLD_REDIRECT_URL: string;
+}
 
-export interface MLEnv { }
+export interface MLEnv {
+    ML_CLIENT_ID: string;
+    ML_CLIENT_SECRET: string;
+    ML_REDIRECT_URL: string;
+}
 
 export interface GitHubEnv {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
     REDIRECT_URI: string;
+}
+
+export const GetWorldIDEnv = () => {
+    const worldIDEnvData: WorldIDEnv = {
+        WORLD_ID: process.env.WORLD_ID || "",
+        WORLD_SECRET: process.env.WORLD_SECRET || "",
+        WORLD_REDIRECT_URL: process.env.WORLD_REDIRECT_URL || ""
+    }
+    return worldIDEnvData;
 }
 
 export const GetGitHubEnv = () => {

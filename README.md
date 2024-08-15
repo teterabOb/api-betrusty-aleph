@@ -74,3 +74,11 @@ https://la-url-de-nuestra-api.com/github/user-info
 ```shell
 curl -X GET "https://la-url-de-nuestra-api.com/github/user-info?access_token=YOUR_ACCESS_TOKEN"
 ```
+
+# Despliegue
+
+Para hacer un despliegue en el ambiente de producción, ejecuta el siguiente comando. Tomará las variables de entorno que tienes configuradas en el archivo `.env`
+
+```shell
+vercel deploy -e NODE_ENV=production --prod
+```

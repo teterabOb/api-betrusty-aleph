@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import { Request, Response, Router } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
 import userDBB from "../../dbb/user";
+import { log } from "console";
 
 interface TokenResponse {
   access_token: string;
@@ -22,10 +23,21 @@ router.get("/callback", async (req: Request, res: Response) => {
   }
 
   try {
+    // Obtenemos el token
     const tokenResponse = await getTokenFromGithub(code as string);
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse;
 
+    // Validamos si el usuario ya existe en la base de datos
+    // Este ID debemos obtenerlo con el DID
+    // Cuando el usuario inicia sesion guardaremos data 
+    // En todas las tablas para asegurar el DID y el ID_USER
     const userDataFromDBB = await userDBB.getUser("1");
+    console.log("userDataFromDBB : ", userDataFromDBB);
+
+    if(userDataFromDBB.rowCount === 0){
+      await userDBB.saveUser("did1", "test name", "test email");
+     }
+
     const userDataFromGithub = await getUserDataFromGithub(access_token);
     const email = userDataFromGithub.email;
 

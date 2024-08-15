@@ -2,13 +2,14 @@ import express from "express";
 import axios from "axios";
 import { Request, Response } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
+import userDBB from "../../dbb/user";
 
 const router = express.Router();
 
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
 // Punto de entrada para generar el Token de autenticación
-router.get("/", async (_req, res) => {
+router.get("/", async (_req: Request, res: Response) => {
   const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
   res.redirect(githubAuthUrl);
 });
@@ -37,9 +38,7 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse.data;
 
-    //await saveTokensToDB(accessToken, refreshToken);
-    console.log(access_token);
-    console.log(refresh_token)
+    await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in );
 
     return res.redirect(`/user-info?access_token=${access_token}`);
   } catch (error) {
@@ -64,9 +63,6 @@ router.get("/user-info", async (req: Request, res: Response) => {
   }
 })
 
-async function saveTokensToDB(accessToken: string, refreshToken: string) {
-  // Implementar la lógica para guardar los tokens en la base de datos
-}
 
 async function refreshAccessToken(refreshToken: string) {
   // Implementar la lógica para refrescar el token de acceso

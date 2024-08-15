@@ -1,9 +1,28 @@
 import { sql } from "@vercel/postgres";
 
-const saveTokens = async (idUser: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {
+// Clase de error personalizada
+class CustomError extends Error {
+    constructor(public message: string, public statusCode: number) {
+        super(message);
+        this.name = "CustomError";
+    }
+}
 
-    if (idUser === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined)
-        throw new Error("Undefined values");
+export interface Tokens {
+    idUser: string;
+    accessToken: string;
+    expires_in: string;
+    refresh_token: string;
+    refresh_token_expires_in: string;
+    email: string;
+  }
+
+const saveTokens = async (idUser: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {
+    console.log("Saving tokens");
+    console.log("email from github : " ,email);
+    
+    if (idUser === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)
+        return new CustomError("Missing parameters", 400);
 
     try {
         const result = await sql`INSERT INTO 
@@ -13,11 +32,13 @@ const saveTokens = async (idUser: string, accessToken: string, expires_in: strin
         EXPIRES_IN, 
         REFRESH_TOKEN, 
         REFRESH_TOKEN_EXPIRES_IN,
-        EMAIL)
-        VALUES(${idUser}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in});`;
+        EMAIL
+        )
+        VALUES(${idUser}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
         return result
     } catch (error) {
-        return error;
+        console.log(error);
+        throw new CustomError("Error saving tokens", 500);
     }
 }
 
@@ -32,28 +53,31 @@ const updateToken = async (idUser: string,
         EXPIRES_IN = ${expires_in}, 
         REFRESH_TOKEN = ${refresh_token}, 
         REFRESH_TOKEN_EXPIRES_IN = ${refresh_token_expires_in}
-        WHERE ID_USER = ${idUser};`;
+        WHERE EMAIL = ${email};`;
         return result
     } catch (error) {
-        return error;
+        console.log(error);
+        throw new CustomError("Error updating token", 500);
     }
 }
 
-const getUser = async (idUser: string) => { 
+const getUser = async (idUser: string) => {
     try {
         const result = await sql`SELECT * FROM Users WHERE ID_USER = ${idUser};`;
         return result;
     } catch (error) {
-        return error;
+        console.log(error);
+        throw new CustomError("Error getting user", 500);
     }
 }
 
-const getGithubByEmail = async (email: string) => { 
+const getGithubByEmail = async (email: string) => {
     try {
         const result = await sql`SELECT * FROM Github WHERE EMAIL = ${email};`;
         return result;
     } catch (error) {
-        return error;
+        console.log(error);
+        throw new CustomError("Error getting user", 500);
     }
 }
 
@@ -68,7 +92,8 @@ const saveUser = async (idUser: string, accessToken: string, expires_in: string,
         VALUES(${idUser}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in});`;
         return result
     } catch (error) {
-        return error;
+        console.log(error);
+        throw new CustomError("Error saving user", 500);
     }
 }
 

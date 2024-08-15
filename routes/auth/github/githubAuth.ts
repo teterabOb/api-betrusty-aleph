@@ -1,29 +1,59 @@
 import express from "express";
-import axios from "axios";
-import { Request, Response } from "express";
+import axios, { AxiosResponse } from "axios";
+import { Request, Response, Router } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
 import userDBB from "../../dbb/user";
 
-const router = express.Router();
+interface TokenResponse {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  refresh_token_expires_in: number;
+}
 
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
-// Punto de entrada para generar el Token de autenticación
-router.get("/", async (_req: Request, res: Response) => {
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
-  res.redirect(githubAuthUrl);
-});
+const router = Router();
 
-// Callback de la autenticación que consultará Github
 router.get("/callback", async (req: Request, res: Response) => {
   const { code } = req.query;
 
   if (!code) {
-    res.status(400).send("Code not found");
+    return res.status(400).send("Code not found");
   }
 
   try {
-    const tokenResponse = await axios.post("https://github.com/login/oauth/access_token",
+    const tokenResponse = await getTokenFromGithub(code as string);
+    const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse;
+
+    const userDataFromGithub = await getUserDataFromGithub(access_token);
+    const email = userDataFromGithub.email;
+
+    if (!email) {
+      return res.status(400).send("Email not found");
+    }
+
+    const githubInfoDBB: any = await userDBB.getGithubByEmail(email.trim());
+
+    if (githubInfoDBB.length > 0) {
+      await userDBB.updateToken(githubInfoDBB[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+    } else {
+      console.log("Saving tokens");
+      console.log("email from github : " ,userDataFromGithub.email);
+      
+      await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+    }
+
+    return res.status(200).json(tokenResponse);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
+async function getTokenFromGithub(code: string) {
+  try {
+    const response = await axios.post("https://github.com/login/oauth/access_token",
       {
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
@@ -34,56 +64,55 @@ router.get("/callback", async (req: Request, res: Response) => {
         headers: {
           Accept: "application/json",
         },
-      })
+      });
 
-    // 1. Validar si Usuario ya existe en la BDD
-    // 2. Si existe, actualizar los tokens
-    // 3. Si NO existe, guardar el token
-    // 4. Retornar la información del usuario
-
-    const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse.data;
-    let email = "";
-    let userDataFromGithub: any;
-
-    try {
-      const userResponse = await axios.get("https://api.github.com/user", { headers: { Authorization: `token ${access_token}` } });
-      const userData = userResponse.data;
-      email = userData.email;
-      userDataFromGithub = userResponse.data;
-      console.log("userDataFromGithub : ", userDataFromGithub);
-      
-      //res.json(userData);
-    } catch (error) {
-      res.status(500).send({ error: "Error obteniendo la info del User from Github" });
-    }
-
-    console.log("****************");
-    console.log("email : ", email);
-
-    if(!email) { 
-      res.status(400).send("Email not found");
-    }
-
-    // Utilizaremos el Correo como ID para Github
-    const githubInfoDBB = await userDBB.getGithubByEmail(email.trim());
-    console.log(" githubindodbb :  ",githubInfoDBB);
-    //const userInDBB = await userDBB.getUser(githubInfoDBB[0].id_user);
-
-    try {
-      const result = await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
-      console.log(result);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: "Error al insertar en la BDD" });
-    }
-    res.status(200).json(tokenResponse.data);
-    //return res.redirect(`/user-info?access_token=${access_token}`);
+    return response.data;
   } catch (error) {
-    res.status(500).send({ error: error });
+    throw new Error("Error fetching token from GitHub");
   }
-});
+}
 
-// Obtiene la información del Usuario
+async function getUserDataFromGithub(access_token: string) {
+  try {
+    const response = await axios.get("https://api.github.com/user", {
+      headers: {
+        Authorization: `token ${access_token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching user data from GitHub");
+  }
+}
+
+async function refreshAccessToken(refreshToken: string): Promise<TokenResponse | null> {
+  if (!refreshToken) {
+    throw new Error("Refresh token is required");
+  }
+
+  try {
+    const response: AxiosResponse<TokenResponse> = await axios.post("https://github.com/login/oauth/access_token",
+      {
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        grant_type: "refresh_token",
+        refresh_token: refreshToken,
+      },
+      {
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+    return null;
+  }
+}
+
+
 router.get("/user-info", async (req: Request, res: Response) => {
   const { access_token } = req.query;
 
@@ -100,28 +129,4 @@ router.get("/user-info", async (req: Request, res: Response) => {
   }
 })
 
-// Refresh Token de acceso
-
-async function refreshAccessToken(refreshToken: string) {
-  // Implementar la lógica para refrescar el token de acceso
-  try {
-    const tokenResponse = await axios.post("https://github.com/login/oauth/access_token",
-      {
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        grant_type: "refresh_token",
-        // The refresh token that you received when you generated a user access token.
-        refresh_token: refreshToken,
-      },
-      {
-        headers: {
-          Accept: "application/json",
-        },
-      })
-  } catch (error) {
-    console.error(error);
-  }
-}
-
 export default router;
-

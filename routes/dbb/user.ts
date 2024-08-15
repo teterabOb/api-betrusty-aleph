@@ -17,24 +17,20 @@ export interface Tokens {
     email: string;
   }
 
-const saveTokens = async (idUser: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {
-    console.log("Saving tokens");
-    console.log("email from github : " ,email);
-    
+const saveTokens = async (idUser: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {    
     if (idUser === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)
         return new CustomError("Missing parameters", 400);
 
     try {
         const result = await sql`INSERT INTO 
-        Github(
-        ID_USER, 
+        Github( 
         ACCESS_TOKEN, 
         EXPIRES_IN, 
         REFRESH_TOKEN, 
         REFRESH_TOKEN_EXPIRES_IN,
         EMAIL
         )
-        VALUES(${idUser}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
+        VALUES(${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
         return result
     } catch (error) {
         console.log(error);
@@ -81,15 +77,14 @@ const getGithubByEmail = async (email: string) => {
     }
 }
 
-const saveUser = async (idUser: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string) => {
+const saveUser = async (did: string, name: string, email: string) => {
     try {
         const result = await sql`INSERT INTO 
-        User(ID_USER, 
-        ACCESS_TOKEN, 
-        EXPIRES_IN, 
-        REFRESH_TOKEN, 
-        REFRESH_TOKEN_EXPIRES_IN)
-        VALUES(${idUser}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in});`;
+        Users( 
+        DID, 
+        NAME, 
+        EMAIL)
+        VALUES(${did}, ${name}, ${email});`;
         return result
     } catch (error) {
         console.log(error);

@@ -1,4 +1,3 @@
-import express from "express";
 import axios, { AxiosResponse } from "axios";
 import { Request, Response, Router } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
@@ -26,6 +25,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     const tokenResponse = await getTokenFromGithub(code as string);
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse;
 
+    const userDataFromDBB = await userDBB.getUser("1");
     const userDataFromGithub = await getUserDataFromGithub(access_token);
     const email = userDataFromGithub.email;
 
@@ -33,14 +33,13 @@ router.get("/callback", async (req: Request, res: Response) => {
       return res.status(400).send("Email not found");
     }
 
-    const githubInfoDBB: any = await userDBB.getGithubByEmail(email.trim());
+    const githubInfoDBB: any = await userDBB.getGithubByEmail(email);
+    console.log("githubInfoDBB : ", githubInfoDBB);
+    
 
-    if (githubInfoDBB.length > 0) {
-      await userDBB.updateToken(githubInfoDBB[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+    if (githubInfoDBB.rowCount > 0) {
+      await userDBB.updateToken(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     } else {
-      console.log("Saving tokens");
-      console.log("email from github : " ,userDataFromGithub.email);
-      
       await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     }
 

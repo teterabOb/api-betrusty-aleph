@@ -33,9 +33,9 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userDataFromDBB = await userDBB.getUser("1");
     console.log("userDataFromDBB : ", userDataFromDBB);
 
-    if(userDataFromDBB.rowCount === 0){
+    if (userDataFromDBB.rowCount === 0) {
       await userDBB.saveUser("did1", "test name", "test email");
-     }
+    }
 
     const userDataFromGithub = await getUserDataFromGithub(access_token);
     const email = userDataFromGithub.email;
@@ -46,7 +46,7 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const githubInfoDBB: any = await userDBB.getGithubByEmail(email);
     console.log("githubInfoDBB : ", githubInfoDBB);
-    
+
 
     if (githubInfoDBB.rowCount > 0) {
       await userDBB.updateToken(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);

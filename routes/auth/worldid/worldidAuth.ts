@@ -37,11 +37,10 @@ router.get("/", async (req: Request, res: Response) => {
     res.status(200).send({ url: url });
 });
 
+// Para crear el Token se debe ecodear el client_id y el client_secret en base64
 router.get("/callback", async (req: Request, res: Response) => {
     
  });
-
-
 
 const verifyProofBackEnd = async (proof: ISuccessResult, appId: string, action: string) => {
     const apiUrl = `https://developer.worldcoin.org/api/v2/verify/${appId}`;
@@ -70,7 +69,5 @@ const verifyProofBackEnd = async (proof: ISuccessResult, appId: string, action: 
         return { error: true };
     }
 };
-
-
 
 export default router

@@ -67,15 +67,7 @@ router.get("/callback", async (req: Request, res: Response) => {
                 },
             },
         )
-        /*
-        access_token
-        token_type
-        expires_in
-        scope
-        id_token 
-        */
-       //return response.data;
-       // Guardar
+
        return res.status(200).send(response.data);
     } catch (error: any) {        
         console.log(error)

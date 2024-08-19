@@ -31,8 +31,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     // Cuando el usuario inicia sesion guardaremos data 
     // En todas las tablas para asegurar el DID y el ID_USER
     const userDataFromDBB = await userDBB.getUser("1");
-    console.log("userDataFromDBB : ", userDataFromDBB);
-
+    
     if (userDataFromDBB.rowCount === 0) {
       await userDBB.saveUser("did1", "test name", "test email");
     }
@@ -57,7 +56,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     return res.status(200).json(tokenResponse);
   } catch (error) {
     console.error(error);
-    return res.status(500).send({ error: "Internal Server Error" });
+    return res.status(500).send({ error: `Internal Server Error ${error}` });
   }
 });
 
@@ -121,7 +120,6 @@ async function refreshAccessToken(refreshToken: string): Promise<TokenResponse |
     return null;
   }
 }
-
 
 router.get("/user-info", async (req: Request, res: Response) => {
   const { access_token } = req.query;

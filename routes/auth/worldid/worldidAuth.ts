@@ -1,9 +1,16 @@
 import { Router } from "express";
 import { Request, Response } from "express";
 import { type ISuccessResult } from '@worldcoin/idkit'
+import { GetWorldIDEnv } from "../../../helpers/data/envData";
 
 const router = Router();
 
+const { WORLD_ID,
+    WORLD_SECRET,
+    WORLD_REDIRECT_URI,
+    WORLDID_TOKEN_URL } = GetWorldIDEnv();
+
+// Endpoint to validate Action
 router.get("/validate-api", async (req: Request, res: Response) => {
     const { proof, signal } = req.body;
     const app_id = process.env.WORLDID_APP_ID || "";
@@ -16,6 +23,25 @@ router.get("/validate-api", async (req: Request, res: Response) => {
         res.status(500).send({ message: "WorldID verification failed" });
     }
 });
+
+// Endpoint to get the Auth URL
+router.get("/", async (req: Request, res: Response) => {
+    const response_type = "code";
+    const redirect_uri = WORLD_REDIRECT_URI;
+    const scope = "openid+profile+email";
+    const client_id = WORLD_ID;
+    const world_id_endpoint = "https://worldcoin.org/oauth/authorize";
+
+    const url = `${world_id_endpoint}?response_type=${response_type}&redirect_uri=${redirect_uri}&scope=${scope}&client_id=${client_id}`
+
+    res.status(200).send({ url: url });
+});
+
+router.get("/callback", async (req: Request, res: Response) => {
+    
+ });
+
+
 
 const verifyProofBackEnd = async (proof: ISuccessResult, appId: string, action: string) => {
     const apiUrl = `https://developer.worldcoin.org/api/v2/verify/${appId}`;
@@ -37,7 +63,7 @@ const verifyProofBackEnd = async (proof: ISuccessResult, appId: string, action: 
     if (response.ok) {
         const respVerification = await response.json();
         console.log('response', respVerification);
-        
+
         return { error: false, nullifier_hash: respVerification.nullifier_hash, uses: respVerification.uses };
     } else {
         //console.log('response', await response.json());
@@ -45,16 +71,6 @@ const verifyProofBackEnd = async (proof: ISuccessResult, appId: string, action: 
     }
 };
 
-/*
-{
-    "success": true,
-    "uses": 4,
-    "action": "verify-identity",
-    "created_at": "2024-08-17T00:15:23.86437+00:00",
-    "max_uses": 0,
-    "nullifier_hash": "0x04a74bd57677629286c6e13289c00029dc776595eb368382ccc69d65b604a0ad"
-}
-*/
 
 
 export default router

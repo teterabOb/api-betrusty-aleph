@@ -13,13 +13,14 @@ export interface EnvironmentData {
 export interface WorldIDEnv {
     WORLD_ID: string;
     WORLD_SECRET: string;
-    WORLD_REDIRECT_URL: string;
+    WORLD_REDIRECT_URI: string;
+    WORLDID_TOKEN_URL: string;
 }
 
 export interface MLEnv {
     ML_CLIENT_ID: string;
     ML_CLIENT_SECRET: string;
-    ML_REDIRECT_URL: string;
+    ML_REDIRECT_URI: string;
 }
 
 export interface GitHubEnv {
@@ -32,7 +33,8 @@ export const GetWorldIDEnv = () => {
     const worldIDEnvData: WorldIDEnv = {
         WORLD_ID: process.env.WORLD_ID || "",
         WORLD_SECRET: process.env.WORLD_SECRET || "",
-        WORLD_REDIRECT_URL: process.env.WORLD_REDIRECT_URL || ""
+        WORLD_REDIRECT_URI: process.env.WORLD_REDIRECT_URI || "",
+        WORLDID_TOKEN_URL: process.env.WORLDID_TOKEN_URL || ""
     }
     return worldIDEnvData;
 }
@@ -44,6 +46,15 @@ export const GetGitHubEnv = () => {
         REDIRECT_URI: process.env.GITHUB_REDIRECT_URI || ""
     }
     return githubEnvData;
+}
+
+export const GetMLEnv = () => { 
+    const mlEnvData: MLEnv = {
+        ML_CLIENT_ID: process.env.ML_CLIENT_ID || "",
+        ML_CLIENT_SECRET: process.env.ML_CLIENT_SECRET || "",
+        ML_REDIRECT_URI: process.env.ML_REDIRECT_URI || ""
+    }
+    return mlEnvData;
 }
 
 export const getEnvData = () => {

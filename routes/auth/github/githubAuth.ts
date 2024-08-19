@@ -77,7 +77,7 @@ async function getTokenFromGithub(code: string) {
 
     return response.data;
   } catch (error) {
-    throw new Error("Error fetching token from GitHub");
+    throw new Error(`getTokenFromGithub Error : ` + error);
   }
 }
 

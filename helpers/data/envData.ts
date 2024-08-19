@@ -31,9 +31,9 @@ export interface GitHubEnv {
 
 export const GetWorldIDEnv = () => {
     const worldIDEnvData: WorldIDEnv = {
-        WORLD_ID: process.env.WORLD_ID || "",
-        WORLD_SECRET: process.env.WORLD_SECRET || "",
-        WORLD_REDIRECT_URI: process.env.WORLD_REDIRECT_URI || "",
+        WORLD_ID: process.env.WORLDID_APP_ID || "",
+        WORLD_SECRET: process.env.WORLDID_ACTION_ID || "",
+        WORLD_REDIRECT_URI: process.env.WORLDID_REDIRECT_URI || "",
         WORLDID_TOKEN_URL: process.env.WORLDID_TOKEN_URL || ""
     }
     return worldIDEnvData;

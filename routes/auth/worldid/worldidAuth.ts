@@ -1,7 +1,9 @@
-import { Router } from "express";
+import { response, Router } from "express";
 import { Request, Response } from "express";
 import { type ISuccessResult } from '@worldcoin/idkit'
 import { GetWorldIDEnv } from "../../../helpers/data/envData";
+import axios from 'axios';
+import qs from 'qs';
 
 const router = Router();
 
@@ -37,10 +39,57 @@ router.get("/", async (req: Request, res: Response) => {
     res.status(200).send({ url: url });
 });
 
+// Endpoint to get the Token
+router.get("/callback", async (req: Request, res: Response) => {
+    const endpoint = "https://id.worldcoin.org/token"
+    const code = req.query.code;
+
+    const grant_type = "authorization_code"
+    const redirect_uri = WORLD_REDIRECT_URI;
+
+    if (!code || code === "" || redirect_uri === "") {
+        return res.status(400).send({ message: `Code is required ${code} , ${redirect_uri}` });
+    }
+
+
+    try {
+        const response = await axios.post(endpoint,
+            qs.stringify({
+                code: code,
+                grant_type: grant_type,
+                redirect_uri: "https://trusthub-ml.vercel.app/"
+            }),
+            {
+                headers: {
+                    'Authorization': `Basic YXBwX2I1YmY3MGE2M2U0ZWNkMGJlNWYxYjc1NGI2Njc1NzI4OnNrX2JkMjYzYjAwNzk1NjJiNmRlYjE0YTUwYTEyNGQwNTY1ODc4Y2NiOWQ2NjM2NmQ5OQ==`,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json',
+                },
+            },
+        )
+        /*
+        access_token
+        token_type
+        expires_in
+        scope
+        id_token 
+        */
+       //return response.data;
+       return res.status(200).send(response.data);
+    } catch (error: any) {        
+        console.log(error)
+        console.log('code', code);
+        //console.log(JSON.stringify(error))
+        return res.status(500).send({ message: "Failed to fetch access token" });
+    }
+});
+
+// User Info
+
 // Para crear el Token se debe ecodear el client_id y el client_secret en base64
 router.get("/callback", async (req: Request, res: Response) => {
-    
- });
+
+});
 
 const verifyProofBackEnd = async (proof: ISuccessResult, appId: string, action: string) => {
     const apiUrl = `https://developer.worldcoin.org/api/v2/verify/${appId}`;

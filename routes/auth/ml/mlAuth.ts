@@ -17,7 +17,7 @@ router.get("/", async (_req, res) => {
 router.get("/callback", async (req: Request, res: Response) => {
   const { code } = req.query;
 
-  if (!code) {
+  if (!code || typeof code !== "string" || CLIENT_ID === "" || CLIENT_SECRET === "") {
     return res.status(400).send("Code not found");
   }
 
@@ -26,7 +26,7 @@ router.get("/callback", async (req: Request, res: Response) => {
       {
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
-        code,
+        code: code,
         redirect_uri: REDIRECT_URI,
       },
       {

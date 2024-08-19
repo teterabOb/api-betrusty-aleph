@@ -31,7 +31,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     // Cuando el usuario inicia sesion guardaremos data 
     // En todas las tablas para asegurar el DID y el ID_USER
     const userDataFromDBB = await userDBB.getUser("1");
-    
+
     if (userDataFromDBB.rowCount === 0) {
       await userDBB.saveUser("did1", "test name", "test email");
     }
@@ -61,8 +61,10 @@ router.get("/callback", async (req: Request, res: Response) => {
 });
 
 async function getTokenFromGithub(code: string) {
+  //https://github.com/login/oauth/access_token?client_id=Iv23liSHZg3lbRlkRrAu&client_secret=44e358abae826ec1afe04c6af842554251a26958&code=1df5c349822e17924679&redirect_uri=https://api-betrusty.vercel.app/github/callback
   try {
-    const response = await axios.post("https://github.com/login/oauth/access_token",
+    const response = await axios.post(
+      "https://github.com/login/oauth/access_token",
       {
         client_id: CLIENT_ID,
         client_secret: CLIENT_SECRET,
@@ -71,15 +73,51 @@ async function getTokenFromGithub(code: string) {
       },
       {
         headers: {
-          Accept: "application/json",
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
-      });
+      }
+    );
 
     return response.data;
   } catch (error) {
-    throw new Error(`getTokenFromGithub Error : ` + error);
+    console.error("Error fetching access token:", error);
+    throw new Error("Failed to fetch access token");
   }
 }
+
+router.get('/get-github-token', async (req: Request, res: Response) => {
+  const { code } = req.query;
+
+  console.log("code : ", code);
+
+  if (!code) {
+     return res.status(400).json({ error: 'Code is required' });
+  }
+
+  try {
+    const response = await axios.post(
+      "https://github.com/login/oauth/access_token",
+      {
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        code,
+        redirect_uri: REDIRECT_URI,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+      }
+    );
+
+    return res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching access token:", error);
+    return res.status(500).json({ error: 'Failed to fetch access token' });
+  }
+});
 
 async function getUserDataFromGithub(access_token: string) {
   try {

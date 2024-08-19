@@ -86,39 +86,6 @@ async function getTokenFromGithub(code: string) {
   }
 }
 
-router.get('/get-github-token', async (req: Request, res: Response) => {
-  const { code } = req.query;
-
-  console.log("code : ", code);
-
-  if (!code) {
-     return res.status(400).json({ error: 'Code is required' });
-  }
-
-  try {
-    const response = await axios.post(
-      "https://github.com/login/oauth/access_token",
-      {
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        code,
-        redirect_uri: REDIRECT_URI,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      }
-    );
-
-    return res.json(response.data);
-  } catch (error) {
-    console.error("Error fetching access token:", error);
-    return res.status(500).json({ error: 'Failed to fetch access token' });
-  }
-});
-
 async function getUserDataFromGithub(access_token: string) {
   try {
     const response = await axios.get("https://api.github.com/user", {

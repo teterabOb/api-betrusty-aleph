@@ -75,6 +75,7 @@ router.get("/callback", async (req: Request, res: Response) => {
         id_token 
         */
        //return response.data;
+       // Guardar
        return res.status(200).send(response.data);
     } catch (error: any) {        
         console.log(error)

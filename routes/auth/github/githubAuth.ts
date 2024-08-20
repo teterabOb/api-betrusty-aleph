@@ -19,7 +19,7 @@ router.get("/login", (req: Request, res: Response) => {
   
   const redirect_uri = REDIRECT_URI;
   const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback?email=${worldid_email}`;
-  res.redirect(redirect_uri)
+  res.redirect(URL)
 });
 
 router.get("/callback", async (req: Request, res: Response) => {

@@ -2,6 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import { Request, Response, Router } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
 import userDBB from "../../dbb/user";
+import session from 'express-session';
 
 interface TokenResponse {
   access_token: string;
@@ -14,22 +15,36 @@ const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
 const router = Router();
 
+declare module 'express-session' {
+  interface SessionData {
+    world_id_email: { worldid_email: string };
+  }
+}
+
+//Configurar express-session
+router.use(session({
+  secret: 'my-secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
+
 router.get("/login", (req: Request, res: Response) => { 
   const worldid_email = "custom_state";
-  
-  const redirect_uri = REDIRECT_URI;
-  // Guardar el parámetro en una cookie
-  res.cookie('worldid_email', worldid_email, { httpOnly: true, secure: true });
+  // Guardar el parámetro en la sesión
+  req.session.world_id_email = { worldid_email: worldid_email };
+
   const URL = `https://api-betrusty.vercel.app/github/callback`;
-  res.redirect(URL)
+  res.redirect(URL);
 });
 
 router.get("/callback", async (req: Request, res: Response) => {
   const { code } = req.query;
-  console.log(req.cookies);
   
-  //const worldid_email = req.cookies.worldid_email;
+  const worldid_email = req.session.world_id_email; // Acceder a la sesión
 
+  console.log("worldid_email", worldid_email);
+  
   /*
   if (!code) {
     return res.status(400).send("Code not found");

@@ -16,7 +16,9 @@ const router = Router();
 
 router.get("/login", (req: Request, res: Response) => { 
   const worldid_email = "custom_state";
+  
   const redirect_uri = REDIRECT_URI;
+  const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback?email=${worldid_email}`;
   res.redirect(redirect_uri)
 });
 

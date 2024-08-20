@@ -18,12 +18,15 @@ router.get("/login", (req: Request, res: Response) => {
   const worldid_email = "custom_state";
   
   const redirect_uri = REDIRECT_URI;
-  const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback?email=${worldid_email}`;
+  // Guardar el parámetro en una cookie
+  res.cookie('worldid_email', worldid_email, { httpOnly: true, secure: true });
+  const URL = ``;
   res.redirect(URL)
 });
 
 router.get("/callback", async (req: Request, res: Response) => {
-  const { code, worldid_email } = req.query;
+  const { code } = req.query;
+  const worldid_email = req.cookies.worldid_email;
 
   /*
   if (!code) {

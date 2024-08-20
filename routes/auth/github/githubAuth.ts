@@ -20,7 +20,7 @@ router.get("/login", (req: Request, res: Response) => {
   const redirect_uri = REDIRECT_URI;
   // Guardar el parámetro en una cookie
   res.cookie('worldid_email', worldid_email, { httpOnly: true, secure: true });
-  const URL = ``;
+  const URL = `https://api-betrusty.vercel.app/github/callback`;
   res.redirect(URL)
 });
 

@@ -34,9 +34,9 @@ router.get("/login", (req: Request, res: Response) => {
   // Guardar el parámetro en la sesión
   req.session.world_id_email = { worldid_email: worldid_email };
   console.log("req session : ", req.session);
-  
+  const myUrl = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback`;
   const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback`;
-  res.redirect(URL);
+  res.redirect(myUrl);
 });
 
 router.get("/callback", async (req: Request, res: Response) => {

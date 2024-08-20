@@ -14,13 +14,21 @@ const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
 const router = Router();
 
-router.get("/callback", async (req: Request, res: Response) => {
-  const { code } = req.query;
+router.get("/login", (req: Request, res: Response) => { 
+  const worldid_email = "custom_state";
+  const redirect_uri = REDIRECT_URI;
+  res.redirect(redirect_uri)
+});
 
+router.get("/callback", async (req: Request, res: Response) => {
+  const { code, worldid_email } = req.query;
+
+  /*
   if (!code) {
     return res.status(400).send("Code not found");
   }
-
+  */
+  return res.status(200).send({ code: code, worldid_email: worldid_email });
   try {
     // Obtenemos el token
     const tokenResponse = await getTokenFromGithub(code as string);
@@ -44,8 +52,6 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     const githubInfoDBB: any = await userDBB.getGithubByEmail(email);
-    //console.log("githubInfoDBB : ", githubInfoDBB);
-
 
     if (githubInfoDBB.rowCount > 0) {
       await userDBB.updateTokenGithub(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);

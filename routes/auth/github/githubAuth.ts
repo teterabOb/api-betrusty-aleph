@@ -23,7 +23,7 @@ declare module 'express-session' {
 
 //Configurar express-session
 router.use(session({
-  secret: 'my-secret',
+  secret: 'your_secure_secret_key',
   resave: false,
   saveUninitialized: true,
   cookie: { secure: true }
@@ -33,7 +33,8 @@ router.get("/login", (req: Request, res: Response) => {
   const worldid_email = "custom_state";
   // Guardar el parámetro en la sesión
   req.session.world_id_email = { worldid_email: worldid_email };
-
+  console.log("req session : ", req.session);
+  
   const URL = `https://api-betrusty.vercel.app/github/callback`;
   res.redirect(URL);
 });

@@ -26,14 +26,16 @@ router.get("/login", (req: Request, res: Response) => {
 
 router.get("/callback", async (req: Request, res: Response) => {
   const { code } = req.query;
-  const worldid_email = req.cookies.worldid_email;
+  console.log(req.cookies);
+  
+  //const worldid_email = req.cookies.worldid_email;
 
   /*
   if (!code) {
     return res.status(400).send("Code not found");
   }
   */
-  return res.status(200).send({ code: code, worldid_email: worldid_email });
+  return res.status(200).send({ code: code, worldid_email: "" });
   try {
     // Obtenemos el token
     const tokenResponse = await getTokenFromGithub(code as string);

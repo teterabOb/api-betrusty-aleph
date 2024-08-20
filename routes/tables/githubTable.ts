@@ -10,9 +10,9 @@ router.get("/", async (_req: Request, res: Response) => {
     try {
         const result = await sql`CREATE TABLE 
         Github(
-        ID_USER BIGINT, 
-        DID VARCHAR(150),
-        ACCESS_TOKEN VARCHAR(150), 
+        ID_USER BIGINT NOT NULL, 
+        DID VARCHAR(150) NOT NULL,
+        ACCESS_TOKEN VARCHAR(150) NOT NULL, 
         EXPIRES_IN VARCHAR(150), 
         REFRESH_TOKEN VARCHAR(150), 
         REFRESH_TOKEN_EXPIRES_IN VARCHAR(150), 

@@ -1,7 +1,8 @@
-import { response, Router } from "express";
+import { Router } from "express";
 import { Request, Response } from "express";
 import { type ISuccessResult } from '@worldcoin/idkit'
 import { GetWorldIDEnv } from "../../../helpers/data/envData";
+import userDBB from "../../dbb/user";
 import axios from 'axios';
 import qs from 'qs';
 
@@ -51,13 +52,12 @@ router.get("/callback", async (req: Request, res: Response) => {
         return res.status(400).send({ message: `Code is required ${code} , ${redirect_uri}` });
     }
 
-
     try {
         const response = await axios.post(endpoint,
             qs.stringify({
                 code: code,
                 grant_type: grant_type,
-                redirect_uri: "https://trusthub-ml.vercel.app/"
+                redirect_uri: WORLD_REDIRECT_URI
             }),
             {
                 headers: {
@@ -68,22 +68,101 @@ router.get("/callback", async (req: Request, res: Response) => {
             },
         )
 
-       return res.status(200).send(response.data);
-    } catch (error: any) {        
-        console.log(error)
-        console.log('code', code);
-        //console.log(JSON.stringify(error))
-        return res.status(500).send({ message: "Failed to fetch access token" });
+        const { access_token, token_type, expires_in, scope, id_token } = response.data;
+
+        // Aqui debo guardar la informacion del usuario en la base de datos
+        let userEmail: string = ""
+        userEmail = await getUserInfo(access_token, token_type);
+
+        if (userEmail === "") {
+            return res.status(400).send({ message: "Error fetching user data from WorldID, empty Email" });
+        }
+
+        // Verificar si el usuario ya existe en la BDD
+        const user = await userDBB.getUserByEmail(userEmail);
+
+        let idUser: string = "";
+
+        // Validamos que la consulta nos devuelva un usuario
+        if (user.rowCount === 0) {
+            // Aqui guardar al usuario en la BDD
+            const insertUser = await userDBB.saveUser("did1", "anon", userEmail);
+            // Obtenemos la info del Usuario recien insertado
+            const user = await userDBB.getUserByEmail(userEmail);
+            // Validamos que haya retornado un usuario
+            console.log("user", user);
+            
+            if (user.rowCount === 0) {
+                return res.status(400).send({ message: "Error saving user in DB" });
+            }
+            // Asignamos el ID del usuario
+            idUser = user.rows[0].id_user;
+            console.log("idUser", idUser);
+            const saveTokensWID = 
+            await userDBB.saveTokensWorldID(idUser.toString(), 
+            access_token, 
+            token_type, 
+            expires_in, 
+            scope, 
+            id_token, 
+            userEmail
+        );
+        } else {
+            console.log("user else", user);
+            const updateTokensWID = 
+            await userDBB.updateTokenWorldID(
+                idUser.toString(), 
+                access_token, 
+                token_type, 
+                expires_in, 
+                scope, 
+                id_token);
+        }
+
+        // Insertamos el token en la BDD
+        return res.status(200).send({ message: "User verified", access_token: access_token, user: user });
+    } catch (error: any) {
+        //console.log("error", error.response.data);
+        const errorDescription = error.response.data || error;
+        return res.status(500).send({ message: errorDescription.error_description });
     }
 });
 
 // User Info
 
 // Para crear el Token se debe ecodear el client_id y el client_secret en base64
-router.get("/callback", async (req: Request, res: Response) => {
+router.get("/get-user-info", async (req: Request, res: Response) => {
 
 });
 
+const getUserInfo = async (access_token: string, token_type: string) => {
+    let userEmail: string = "";
+    try {
+        const endpoint_user_info = "https://id.worldcoin.org/userinfo";
+
+        const requestGetUserInfo = await axios.post(
+            endpoint_user_info,
+            {},
+            {
+                headers: {
+                    'Authorization': `${token_type} ${access_token}`,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json',
+                },
+            },
+        )
+
+        console.log("requestGetUserInfo", requestGetUserInfo.data.email);
+        userEmail = requestGetUserInfo.data.email;
+    } catch (error) {
+        console.log("error", error);
+        throw new Error("Error fetching user data from WorldID");
+    } finally {
+        return userEmail;
+    }
+}
+
+// This is for App Actions Verification
 const verifyProofBackEnd = async (proof: ISuccessResult, appId: string, action: string) => {
     const apiUrl = `https://developer.worldcoin.org/api/v2/verify/${appId}`;
     const response = await fetch(apiUrl, {

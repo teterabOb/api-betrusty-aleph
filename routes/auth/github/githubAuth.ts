@@ -44,19 +44,19 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     const githubInfoDBB: any = await userDBB.getGithubByEmail(email);
-    console.log("githubInfoDBB : ", githubInfoDBB);
+    //console.log("githubInfoDBB : ", githubInfoDBB);
 
 
     if (githubInfoDBB.rowCount > 0) {
-      await userDBB.updateToken(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.updateTokenGithub(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     } else {
       await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     }
 
-    return res.status(200).json(tokenResponse);
+    return res.status(200).json({ message: "Github verified", token_response: tokenResponse});
   } catch (error) {
     console.error(error);
-    return res.status(500).send({ error: `Internal Server Error ${error}` });
+    return res.status(500).send({ message: `Internal Server Error ${error}` });
   }
 });
 

@@ -14,13 +14,33 @@ const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
 const router = Router();
 
+// Se debe enviar worldid_email en el body
+router.get("/login", (req: Request, res: Response) => {
+  const { worldid_email } = req.body
+
+  if (!worldid_email) {
+    return res.status(400).send({ message: "worldid_email not found" });
+  }
+
+  const baseUri = "https://github.com/login/oauth/authorize?client_id="
+  const clientId = ""
+  const redirectUri = ""
+  const finalUri = `${baseUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${worldid_email}`
+  // Se agrego state al final de la URL, esto se enviará a Github y luego se devolverá en el callback
+  const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback&state=${worldid_email}`;
+  return res.redirect(URL);
+});
+
 router.get("/callback", async (req: Request, res: Response) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
+  console.log("worldid_email", state);
+
 
   if (!code) {
     return res.status(400).send("Code not found");
   }
 
+  return res.status(200).send({ code: code, worldid_email: state });
   try {
     // Obtenemos el token
     const tokenResponse = await getTokenFromGithub(code as string);
@@ -44,19 +64,17 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     const githubInfoDBB: any = await userDBB.getGithubByEmail(email);
-    console.log("githubInfoDBB : ", githubInfoDBB);
-
 
     if (githubInfoDBB.rowCount > 0) {
-      await userDBB.updateToken(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.updateTokenGithub(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     } else {
       await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     }
 
-    return res.status(200).json(tokenResponse);
+    return res.status(200).json({ message: "Github verified", token_response: tokenResponse });
   } catch (error) {
     console.error(error);
-    return res.status(500).send({ error: `Internal Server Error ${error}` });
+    return res.status(500).send({ message: `Internal Server Error ${error}` });
   }
 });
 
@@ -85,39 +103,6 @@ async function getTokenFromGithub(code: string) {
     throw new Error("Failed to fetch access token");
   }
 }
-
-router.get('/get-github-token', async (req: Request, res: Response) => {
-  const { code } = req.query;
-
-  console.log("code : ", code);
-
-  if (!code) {
-     return res.status(400).json({ error: 'Code is required' });
-  }
-
-  try {
-    const response = await axios.post(
-      "https://github.com/login/oauth/access_token",
-      {
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        code,
-        redirect_uri: REDIRECT_URI,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      }
-    );
-
-    return res.json(response.data);
-  } catch (error) {
-    console.error("Error fetching access token:", error);
-    return res.status(500).json({ error: 'Failed to fetch access token' });
-  }
-});
 
 async function getUserDataFromGithub(access_token: string) {
   try {

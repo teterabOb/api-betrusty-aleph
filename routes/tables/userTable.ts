@@ -13,7 +13,7 @@ router.get("/", async (_req: Request, res: Response) => {
         ID_USER SERIAL PRIMARY KEY, 
         DID VARCHAR(50),
         NAME VARCHAR(50), 
-        EMAIL VARCHAR(50), 
+        EMAIL VARCHAR(300), 
         CREATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
         UPDATED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
         res.status(200).json(result);

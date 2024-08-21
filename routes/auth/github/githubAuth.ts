@@ -20,7 +20,7 @@ router.get("/login", (req: Request, res: Response) => {
   const worldid_email = "custom_state";
 
   const myUrl = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback`;
-  const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback`;
+  const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback&state=hola`;
   res.redirect(myUrl);
 });
 
@@ -33,7 +33,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     return res.status(400).send("Code not found");
   }
   */
-  return res.status(200).send({ code: code, worldid_email: "" });
+  return res.status(200).send({ code: code, worldid_email: state });
   try {
     // Obtenemos el token
     const tokenResponse = await getTokenFromGithub(code as string);

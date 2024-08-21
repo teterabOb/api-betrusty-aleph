@@ -22,7 +22,7 @@ router.get("/login", (req: Request, res: Response) => {
     return res.status(400).send({ message: "worldid_email not found" });
   }
 
-  const baseUri = ""
+  const baseUri = "https://github.com/login/oauth/authorize?client_id="
   const clientId = ""
   const redirectUri = ""
   const finalUri = `${baseUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${worldid_email}`

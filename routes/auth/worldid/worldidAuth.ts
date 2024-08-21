@@ -11,7 +11,8 @@ const router = Router();
 const { WORLD_ID,
     WORLD_SECRET,
     WORLD_REDIRECT_URI,
-    WORLDID_TOKEN_URL } = GetWorldIDEnv();
+    WORLDID_TOKEN_URL,
+    WORLDID_BASIC_TOKEN  } = GetWorldIDEnv();
 
 // Endpoint to validate Action
 router.get("/validate-api", async (req: Request, res: Response) => {
@@ -61,7 +62,7 @@ router.get("/callback", async (req: Request, res: Response) => {
             }),
             {
                 headers: {
-                    'Authorization': `Basic YXBwX2I1YmY3MGE2M2U0ZWNkMGJlNWYxYjc1NGI2Njc1NzI4OnNrX2JkMjYzYjAwNzk1NjJiNmRlYjE0YTUwYTEyNGQwNTY1ODc4Y2NiOWQ2NjM2NmQ5OQ==`,
+                    'Authorization': `Basic ${WORLDID_BASIC_TOKEN}`,
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Accept': 'application/json',
                 },

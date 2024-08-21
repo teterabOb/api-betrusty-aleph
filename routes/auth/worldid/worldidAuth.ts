@@ -121,6 +121,9 @@ router.get("/callback", async (req: Request, res: Response) => {
         }
 
         // Retornamos el mensaje de usuario verificado
+        // *************************************
+        // AQUI REDIRIGIR A LA PAGINA DE LA APP
+        // *************************************
         return res.status(200).send({ message: "User verified", access_token: access_token, email: userEmail });
     } catch (error: any) {
         //console.log("error", error.response.data);

@@ -15,37 +15,19 @@ const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
 const router = Router();
 
-declare module 'express-session' {
-  interface SessionData {
-    world_id_email: { worldid_email: string };
-  }
-}
 
-//Configurar express-session
-router.use(session({
-  secret: 'your_secure_secret_key',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
-}));
-
-router.get("/login", (req: Request, res: Response) => { 
+router.get("/login", (req: Request, res: Response) => {
   const worldid_email = "custom_state";
-  // Guardar el parámetro en la sesión
-  req.session.world_id_email = { worldid_email: worldid_email };
-  console.log("req session : ", req.session);
+
   const myUrl = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback`;
   const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback`;
   res.redirect(myUrl);
 });
 
 router.get("/callback", async (req: Request, res: Response) => {
-  const { code } = req.query;
-  
-  const worldid_email = req.session.world_id_email; // Acceder a la sesión
+  const { code, state } = req.query;
+  console.log("worldid_email", state);
 
-  console.log("worldid_email", worldid_email);
-  
   /*
   if (!code) {
     return res.status(400).send("Code not found");
@@ -82,7 +64,7 @@ router.get("/callback", async (req: Request, res: Response) => {
       await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     }
 
-    return res.status(200).json({ message: "Github verified", token_response: tokenResponse});
+    return res.status(200).json({ message: "Github verified", token_response: tokenResponse });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: `Internal Server Error ${error}` });

@@ -15,23 +15,32 @@ const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
 const router = Router();
 
-
+// Se debe enviar worldid_email en el body
 router.get("/login", (req: Request, res: Response) => {
-  const worldid_email = "custom_state";
+  const { worldid_email } = req.body
 
-  const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback&state=hola`;
-  res.redirect(URL);
+  if (!worldid_email) {
+    return res.status(400).send({ message: "worldid_email not found" });
+  }
+
+  const baseUri = ""
+  const clientId = ""
+  const redirectUri = ""
+  const finalUri = `${baseUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${worldid_email}`
+  // Se agrego state al final de la URL, esto se enviará a Github y luego se devolverá en el callback
+  const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback&state=${worldid_email}`;
+  return res.redirect(URL);
 });
 
 router.get("/callback", async (req: Request, res: Response) => {
   const { code, state } = req.query;
   console.log("worldid_email", state);
 
-  /*
+
   if (!code) {
     return res.status(400).send("Code not found");
   }
-  */
+
   return res.status(200).send({ code: code, worldid_email: state });
   try {
     // Obtenemos el token

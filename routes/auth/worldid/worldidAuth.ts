@@ -91,36 +91,36 @@ router.get("/callback", async (req: Request, res: Response) => {
             const user = await userDBB.getUserByEmail(userEmail);
             // Validamos que haya retornado un usuario
             console.log("user", user);
-            
+
             if (user.rowCount === 0) {
                 return res.status(400).send({ message: "Error saving user in DB" });
             }
             // Asignamos el ID del usuario
             idUser = user.rows[0].id_user;
-            console.log("idUser", idUser);
-            const saveTokensWID = 
-            await userDBB.saveTokensWorldID(idUser.toString(), 
-            access_token, 
-            token_type, 
-            expires_in, 
-            scope, 
-            id_token, 
-            userEmail
-        );
+            //console.log("idUser", idUser);
+            const saveTokensWID =
+                await userDBB.saveTokensWorldID(idUser.toString(),
+                    access_token,
+                    token_type,
+                    expires_in,
+                    scope,
+                    id_token,
+                    userEmail
+                );
         } else {
-            console.log("user else", user);
-            const updateTokensWID = 
-            await userDBB.updateTokenWorldID(
-                idUser.toString(), 
-                access_token, 
-                token_type, 
-                expires_in, 
-                scope, 
-                id_token);
+            //console.log("user else", user);
+            const updateTokensWID =
+                await userDBB.updateTokenWorldID(
+                    idUser.toString(),
+                    access_token,
+                    token_type,
+                    expires_in,
+                    scope,
+                    id_token);
         }
 
-        // Insertamos el token en la BDD
-        return res.status(200).send({ message: "User verified", access_token: access_token, user: user });
+        // Retornamos el mensaje de usuario verificado
+        return res.status(200).send({ message: "User verified", access_token: access_token, email: userEmail });
     } catch (error: any) {
         //console.log("error", error.response.data);
         const errorDescription = error.response.data || error;

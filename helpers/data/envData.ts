@@ -15,6 +15,7 @@ export interface WorldIDEnv {
     WORLD_SECRET: string;
     WORLD_REDIRECT_URI: string;
     WORLDID_TOKEN_URL: string;
+    WORLDID_BASIC_TOKEN: string;
 }
 
 export interface MLEnv {
@@ -34,7 +35,8 @@ export const GetWorldIDEnv = () => {
         WORLD_ID: process.env.WORLDID_APP_ID || "",
         WORLD_SECRET: process.env.WORLDID_ACTION_ID || "",
         WORLD_REDIRECT_URI: process.env.WORLDID_REDIRECT_URI || "",
-        WORLDID_TOKEN_URL: process.env.WORLDID_TOKEN_URL || ""
+        WORLDID_TOKEN_URL: process.env.WORLDID_TOKEN_URL || "",
+        WORLDID_BASIC_TOKEN: process.env.WORLDID_BASIC_TOKEN || ""
     }
     return worldIDEnvData;
 }

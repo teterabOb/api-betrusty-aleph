@@ -38,12 +38,12 @@ router.get("/callback", async (req: Request, res: Response) => {
   const { code, state } = req.query;
   console.log("worldid_email", state);
 
-  if (!code) {
-    res.status(400).send("Code not found");
+  if (!code || !state) {
+    res.status(400).send("Code not or state not found");
   }
 
-  
   try {
+    let emailInput = state as string;
     // Obtenemos el token
     const tokenResponse = await getTokenFromGithub(code as string);
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse;
@@ -52,20 +52,28 @@ router.get("/callback", async (req: Request, res: Response) => {
     // Este ID debemos obtenerlo con el DID
     // Cuando el usuario inicia sesion guardaremos data 
     // En todas las tablas para asegurar el DID y el ID_USER
-    const userDataFromDBB = await userDBB.getUser("1");
+    //const userDataFromDBB = await userDBB.getUser("1");
 
-    if (userDataFromDBB.rowCount === 0) {
-      await userDBB.saveUser("did1", "test name", "test email");
-    }
+    //if (userDataFromDBB.rowCount === 0) {
+    //await userDBB.saveUser("did1", "test name", emailInput);
+    //}
 
     const userDataFromGithub = await getUserDataFromGithub(access_token);
     const email = userDataFromGithub.email;
 
     if (!email) {
-      return res.status(400).send("Email not found");
+      return res.status(400).send("Email not found in Github");
     }
 
-    const githubInfoDBB: any = await userDBB.getGithubByEmail(email);
+    const idUser = await userDBB.getUserByEmail(email);
+
+    if(idUser.rowCount === 0){ 
+      return res.status(400).send("User not found in Trusthub");
+    }
+
+    const idUserString = idUser.rows[0].id_user;
+
+    const githubInfoDBB: any = await userDBB.getGithubByUserId(idUserString);
 
     if (githubInfoDBB.rowCount > 0) {
       await userDBB.updateTokenGithub(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);

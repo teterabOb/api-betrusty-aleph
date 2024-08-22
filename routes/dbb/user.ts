@@ -97,9 +97,9 @@ const updateTokenWorldID = async (idUser: string, access_token: string, token_ty
     }
 }
 
-const getUser = async (idUser: string) => {
+const getUser = async (email: string) => {
     try {
-        const result = await sql`SELECT * FROM Users WHERE ID_USER = ${idUser};`;
+        const result = await sql`SELECT * FROM Users WHERE EMAIL = ${email};`;
         return result;
     } catch (error) {
         console.log(error);
@@ -107,9 +107,19 @@ const getUser = async (idUser: string) => {
     }
 }
 
+const getGithubByUserId = async (id_user: string) => {
+    try {
+        const result = await sql`SELECT * FROM Github WHERE ID_USER = ${id_user};`;
+        return result;
+    } catch (error) {
+        //console.log(error);
+        throw new CustomError("Error getting user", 500);
+    }
+}
+
 const getGithubByEmail = async (email: string) => {
     try {
-        const result = await sql`SELECT * FROM Github WHERE EMAIL = ${email};`;
+        const result = await sql`SELECT * FROM Github WHERE  = ${email};`;
         return result;
     } catch (error) {
         //console.log(error);
@@ -151,6 +161,6 @@ export default
     getGithubByEmail, 
     updateTokenGithub, 
     updateTokenWorldID,
-    getUserByEmail 
-
+    getUserByEmail,
+    getGithubByUserId
 }; 

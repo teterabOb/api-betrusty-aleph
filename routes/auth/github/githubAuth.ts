@@ -35,12 +35,11 @@ router.get("/callback", async (req: Request, res: Response) => {
   const { code, state } = req.query;
   console.log("worldid_email", state);
 
-
   if (!code) {
     return res.status(400).send("Code not found");
   }
 
-  return res.status(200).send({ code: code, worldid_email: state });
+  
   try {
     // Obtenemos el token
     const tokenResponse = await getTokenFromGithub(code as string);
@@ -71,7 +70,8 @@ router.get("/callback", async (req: Request, res: Response) => {
       await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     }
 
-    return res.status(200).json({ message: "Github verified", token_response: tokenResponse });
+    //return res.status(200).json({ message: "Github verified", token_response: tokenResponse });
+    return res.status(200).send({ code: code, worldid_email: state });
   } catch (error) {
     console.error(error);
     return res.status(500).send({ message: `Internal Server Error ${error}` });

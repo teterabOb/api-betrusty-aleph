@@ -18,7 +18,7 @@ GITHUB_REDIRECT_URI=..."
 
 *Nota: la redirect URI debe coincidir con alguna que esté configurada en `Github` de otra manera fallará la solicitud*
 
-### Pasos para la Autenticación
+### Pasos para la Autenticación - Ejemplo Github
 
 1. El usuario da click y es redireccionado a la siguiente URL. Lo que sucede aquí es que el front-end o aplicación que vaya a consumir esta API debe pegarle al siguiente endpoint. Y este se encargará de redireccionar a la URL para que el usuario otorgue los permisos.
 
@@ -31,7 +31,7 @@ https://github.com/login/oauth/authorize?client_id=GITHUB_CLIENT_ID&redirect_uri
 Endpoint
 
 ```shell
-https://la-url-de-nuestra-api.com/github
+https://la-url-de-nuestra-api.com/github/login
 ```
 
 2. En `github` hemos configurado la `callback URL` para el siguiente endpoint
@@ -81,4 +81,26 @@ Para hacer un despliegue en el ambiente de producción, ejecuta el siguiente com
 
 ```shell
 vercel deploy -e NODE_ENV=production --prod
+```
+
+# Endpoints 
+
+## Login
+
+WorldID
+
+```shell
+https://la-url-de-nuestra-api.com/worldid/login
+```
+
+Github
+
+```shell
+https://la-url-de-nuestra-api.com/github/login
+```
+
+Mercado Libre
+
+```shell
+https://la-url-de-nuestra-api.com/ml/login
 ```

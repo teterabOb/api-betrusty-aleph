@@ -45,6 +45,7 @@ router.get("/", async (req: Request, res: Response) => {
 router.get("/callback", async (req: Request, res: Response) => {
     const endpoint = "https://id.worldcoin.org/token"
     const code = req.query.code;
+    const baseUrl = `https://trusthub-ml.vercel.app/`
 
     const grant_type = "authorization_code"
     const redirect_uri = WORLD_REDIRECT_URI;
@@ -98,7 +99,7 @@ router.get("/callback", async (req: Request, res: Response) => {
             }
             // Asignamos el ID del usuario
             idUser = user.rows[0].id_user;
-            //console.log("idUser", idUser);
+            // No retorna nada, luego se puede borrar, si falla cae al catch
             const saveTokensWID =
                 await userDBB.saveTokensWorldID(idUser.toString(),
                     access_token,
@@ -109,7 +110,7 @@ router.get("/callback", async (req: Request, res: Response) => {
                     userEmail
                 );
         } else {
-            //console.log("user else", user);
+            // No retorna nada, luego se puede borrar, si falla cae al catch
             const updateTokensWID =
                 await userDBB.updateTokenWorldID(
                     idUser.toString(),
@@ -124,11 +125,12 @@ router.get("/callback", async (req: Request, res: Response) => {
         // *************************************
         // AQUI REDIRIGIR A LA PAGINA DE LA APP
         // *************************************
-        return res.status(200).send({ message: "User verified", access_token: access_token, email: userEmail });
+        const baseUrl = `https://trusthub-ml.vercel.app/`
+        const url = `${baseUrl}profile?access_token=${access_token}&email=${userEmail}`;
+        return res.redirect(url);
     } catch (error: any) {
-        //console.log("error", error.response.data);
         const errorDescription = error.response.data || error;
-        return res.status(500).send({ message: errorDescription.error_description });
+        return res.redirect(`${baseUrl}error?error=${errorDescription.error_description}`);
     }
 });
 
@@ -156,10 +158,10 @@ const getUserInfo = async (access_token: string, token_type: string) => {
             },
         )
 
-        console.log("requestGetUserInfo", requestGetUserInfo.data.email);
+        //console.log("requestGetUserInfo", requestGetUserInfo.data.email);
         userEmail = requestGetUserInfo.data.email;
     } catch (error) {
-        console.log("error", error);
+        //console.log("error", error);
         throw new Error("Error fetching user data from WorldID");
     } finally {
         return userEmail;
@@ -167,6 +169,10 @@ const getUserInfo = async (access_token: string, token_type: string) => {
 }
 
 // This is for App Actions Verification
+/*  Esto se utiliza para verificar las acciones de App Actions
+    Tiene unos datos hardcodeados, no la utilizamos ahora pero quedaron
+    las pruebas de como se hace
+ */
 const verifyProofBackEnd = async (proof: ISuccessResult, appId: string, action: string) => {
     const apiUrl = `https://developer.worldcoin.org/api/v2/verify/${appId}`;
     const response = await fetch(apiUrl, {

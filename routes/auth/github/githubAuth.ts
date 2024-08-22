@@ -60,7 +60,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     const idUser = await userDBB.getUserByEmail(emailInput);
     console.log("idUser", idUser);
 
-    if(idUser.rowCount === 0){ 
+    if (idUser.rowCount === 0) {
       return res.status(400).send("User not found in Trusthub");
     }
 
@@ -69,7 +69,7 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const githubInfoDBB: any = await userDBB.getGithubByUserId(idUserString);
     console.log("githubInfoDBB", githubInfoDBB);
-    
+
 
     if (githubInfoDBB.rowCount > 0) {
       await userDBB.updateTokenGithub(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
@@ -77,12 +77,10 @@ router.get("/callback", async (req: Request, res: Response) => {
       await userDBB.saveTokens(idUserString, did, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     }
 
-    //return res.status(200).json({ message: "Github verified", token_response: tokenResponse });
-    //return res.status(200).send({ code: code, worldid_email: state });
-    return res.redirect("https://trusthub-ml.vercel.app?error=false");
+    const baseUrl = `https://trusthub-ml.vercel.app/`
+    const url = `${baseUrl}profile?access_token=${access_token}&email=${emailInput}`;
+    return res.redirect(url);
   } catch (error) {
-    console.error(error);
-    //return res.status(500).send({ message: `Internal Server Error ${error}` });
     return res.redirect("https://trusthub-ml.vercel.app?error=true");
   }
 });

@@ -15,9 +15,9 @@ export interface Tokens {
     refresh_token: string;
     refresh_token_expires_in: string;
     email: string;
-  }
+}
 
-const saveTokens = async (idUser: string, did: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {    
+const saveTokens = async (idUser: string, did: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {
     if (idUser === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)
         return new CustomError("Missing parameters", 400);
 
@@ -32,7 +32,7 @@ const saveTokens = async (idUser: string, did: string, accessToken: string, expi
         REFRESH_TOKEN_EXPIRES_IN,
         EMAIL
         )
-        VALUES(${idUser}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
+        VALUES(${idUser},${did}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
         return result
     } catch (error) {
         console.log(error);
@@ -40,7 +40,7 @@ const saveTokens = async (idUser: string, did: string, accessToken: string, expi
     }
 }
 
-const saveTokensWorldID = async (idUser: string, access_token: string, token_type: string, expires_in: string, scope: string, id_token: string, email: string) => { 
+const saveTokensWorldID = async (idUser: string, access_token: string, token_type: string, expires_in: string, scope: string, id_token: string, email: string) => {
     if (idUser === undefined || access_token === undefined || token_type === undefined || expires_in === undefined || scope === undefined || id_token === undefined)
         return new CustomError("Missing parameters", 400);
 
@@ -82,7 +82,7 @@ const updateTokenGithub = async (idUser: string,
     }
 }
 
-const updateTokenWorldID = async (idUser: string, access_token: string, token_type: string, expires_in: string, scope: string, id_token: string ) => { 
+const updateTokenWorldID = async (idUser: string, access_token: string, token_type: string, expires_in: string, scope: string, id_token: string) => {
     try {
         const result = await sql`UPDATE WorldID 
         SET ACCESS_TOKEN = ${access_token}, 
@@ -128,7 +128,7 @@ const getGithubByEmail = async (email: string) => {
     }
 }
 
-const getUserByEmail = async (email: string) => { 
+const getUserByEmail = async (email: string) => {
     try {
         const result = await sql`SELECT id_user FROM Users WHERE EMAIL = ${email};`;
         return result;
@@ -153,15 +153,15 @@ const saveUser = async (did: string, name: string = "anon", email: string) => {
     }
 }
 
-export default 
-{ 
-    saveTokens, 
-    saveTokensWorldID,
-    saveUser, 
-    getUser, 
-    getGithubByEmail, 
-    updateTokenGithub, 
-    updateTokenWorldID,
-    getUserByEmail,
-    getGithubByUserId
-}; 
+export default
+    {
+        saveTokens,
+        saveTokensWorldID,
+        saveUser,
+        getUser,
+        getGithubByEmail,
+        updateTokenGithub,
+        updateTokenWorldID,
+        getUserByEmail,
+        getGithubByUserId
+    }; 

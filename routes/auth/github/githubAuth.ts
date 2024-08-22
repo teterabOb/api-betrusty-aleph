@@ -70,7 +70,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     if (githubInfoDBB.rowCount > 0) {
       await userDBB.updateTokenGithub(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     } else {
-      await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.saveTokens(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     }
 
     //return res.status(200).json({ message: "Github verified", token_response: tokenResponse });

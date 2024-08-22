@@ -24,13 +24,14 @@ const saveTokens = async (idUser: string, accessToken: string, expires_in: strin
     try {
         const result = await sql`INSERT INTO 
         Github( 
+        ID_USER,
         ACCESS_TOKEN, 
         EXPIRES_IN, 
         REFRESH_TOKEN, 
         REFRESH_TOKEN_EXPIRES_IN,
         EMAIL
         )
-        VALUES(${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
+        VALUES(${idUser}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
         return result
     } catch (error) {
         console.log(error);

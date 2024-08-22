@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from "axios";
-import { Request, Response, Router } from "express";
+import express, { Request, Response } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
 import userDBB from "../../dbb/user";
 
@@ -12,11 +12,14 @@ interface TokenResponse {
 
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
-const router = Router();
+const app = express();
+app.use(express.json());
+const router = express.Router();
 
-// Se debe enviar worldid_email en el body
+
+// Se debe enviar `worldid_email` en la url
 router.get("/login", (req: Request, res: Response) => {
-  const { worldid_email } = req.body
+  const { worldid_email } = req.query
 
   if (!worldid_email) {
     return res.status(400).send({ message: "worldid_email not found" });
@@ -36,7 +39,7 @@ router.get("/callback", async (req: Request, res: Response) => {
   console.log("worldid_email", state);
 
   if (!code) {
-    return res.status(400).send("Code not found");
+    res.status(400).send("Code not found");
   }
 
   
@@ -71,10 +74,12 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     //return res.status(200).json({ message: "Github verified", token_response: tokenResponse });
-    return res.status(200).send({ code: code, worldid_email: state });
+    //return res.status(200).send({ code: code, worldid_email: state });
+    return res.redirect("https://trusthub-ml.vercel.app?error=false");
   } catch (error) {
     console.error(error);
-    return res.status(500).send({ message: `Internal Server Error ${error}` });
+    //return res.status(500).send({ message: `Internal Server Error ${error}` });
+    return res.redirect("https://trusthub-ml.vercel.app?error=true");
   }
 });
 

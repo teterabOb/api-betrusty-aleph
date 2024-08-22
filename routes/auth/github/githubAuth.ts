@@ -65,7 +65,8 @@ router.get("/callback", async (req: Request, res: Response) => {
       return res.status(400).send("Email not found in Github");
     }
 
-    const idUser = await userDBB.getUserByEmail(email);
+    const idUser = await userDBB.getUserByEmail(emailInput);
+    console.log("idUser", idUser);
 
     if(idUser.rowCount === 0){ 
       return res.status(400).send("User not found in Trusthub");

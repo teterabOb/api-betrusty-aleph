@@ -17,7 +17,7 @@ export interface Tokens {
     email: string;
   }
 
-const saveTokens = async (idUser: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {    
+const saveTokens = async (idUser: string, did: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {    
     if (idUser === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)
         return new CustomError("Missing parameters", 400);
 
@@ -25,6 +25,7 @@ const saveTokens = async (idUser: string, accessToken: string, expires_in: strin
         const result = await sql`INSERT INTO 
         Github( 
         ID_USER,
+        DID,
         ACCESS_TOKEN, 
         EXPIRES_IN, 
         REFRESH_TOKEN, 

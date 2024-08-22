@@ -44,6 +44,7 @@ router.get("/callback", async (req: Request, res: Response) => {
 
   try {
     let emailInput = state as string;
+    let did = "did1";
     // Obtenemos el token
     const tokenResponse = await getTokenFromGithub(code as string);
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse;
@@ -63,6 +64,7 @@ router.get("/callback", async (req: Request, res: Response) => {
       return res.status(400).send("User not found in Trusthub");
     }
 
+    // Hay que modificar aqui y obtener el Id del Usuario y el DID
     const idUserString = idUser.rows[0].id_user;
 
     const githubInfoDBB: any = await userDBB.getGithubByUserId(idUserString);
@@ -72,7 +74,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     if (githubInfoDBB.rowCount > 0) {
       await userDBB.updateTokenGithub(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     } else {
-      await userDBB.saveTokens(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.saveTokens(idUserString, did, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     }
 
     //return res.status(200).json({ message: "Github verified", token_response: tokenResponse });

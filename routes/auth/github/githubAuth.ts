@@ -48,15 +48,6 @@ router.get("/callback", async (req: Request, res: Response) => {
     const tokenResponse = await getTokenFromGithub(code as string);
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse;
 
-    // Validamos si el usuario ya existe en la base de datos
-    // Este ID debemos obtenerlo con el DID
-    // Cuando el usuario inicia sesion guardaremos data 
-    // En todas las tablas para asegurar el DID y el ID_USER
-    //const userDataFromDBB = await userDBB.getUser("1");
-
-    //if (userDataFromDBB.rowCount === 0) {
-    //await userDBB.saveUser("did1", "test name", emailInput);
-    //}
 
     const userDataFromGithub = await getUserDataFromGithub(access_token);
     const email = userDataFromGithub.email;
@@ -75,11 +66,13 @@ router.get("/callback", async (req: Request, res: Response) => {
     const idUserString = idUser.rows[0].id_user;
 
     const githubInfoDBB: any = await userDBB.getGithubByUserId(idUserString);
+    console.log("githubInfoDBB", githubInfoDBB);
+    
 
     if (githubInfoDBB.rowCount > 0) {
-      await userDBB.updateTokenGithub(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.updateTokenGithub(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     } else {
-      await userDBB.saveTokens(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.saveTokens(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     }
 
     //return res.status(200).json({ message: "Github verified", token_response: tokenResponse });

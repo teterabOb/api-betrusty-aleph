@@ -8,17 +8,39 @@ const router = express.Router();
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
 // Punto de entrada para generar el Token de autenticación
-router.get("/login", async (_req, res) => {
-  const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
-  res.redirect(githubAuthUrl);
+router.get("/login", async (req: Request, res: Response) => {
+  const { worldid_email, country_code } = req.query;
+
+  if (!worldid_email) {
+    return res.status(400).send("state custom value not found");
+  }
+
+  let countryCode = "";
+
+  if(country_code == "CL"){
+    countryCode = ".cl";
+  }else if(country_code == "AR"){ 
+    countryCode = ".com.ar";
+  }else{
+    countryCode = ".cl";
+  }
+
+  //https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=$APP_ID&state=ABC123&redirect_uri=$REDIRECT_URL
+  const mlAuthUrl = `https://auth.mercadolibre${countryCode}/authorization?`
+  const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${CLIENT_ID}&state=${worldid_email}&redirect_uri=${REDIRECT_URI}`;
+  //const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&state=${worldid_email}`;
+  return res.redirect(finalUrlMl);
 });
 
 // Callback de la autenticación que consultará Github
 router.get("/callback", async (req: Request, res: Response) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
+  console.log("worldid_email", state);
 
-  if (!code || typeof code !== "string" || CLIENT_ID === "" || CLIENT_SECRET === "") {
-    return res.status(400).send("Code not found");
+  if (!code || !state || typeof code !== "string" || CLIENT_ID === "" || CLIENT_SECRET === "") {
+    // Aqui tiene que redireccionar a una ruta de error
+    //return res.redirect("/error");
+    return res.status(400).send("Code or state not found");
   }
 
   try {
@@ -39,6 +61,10 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     //await saveTokensToDB(accessToken, refreshToken);
 
+
+
+    const baseUrl = `https://trusthub-ml.vercel.app/`
+    const url = `${baseUrl}profile?access_token=${access_token}&email=${state}`;
     return res.redirect(`/user-info?access_token=${access_token}`);
   } catch (error) {
     return res.status(500).send({ error: error });
@@ -60,7 +86,22 @@ router.get("/user-info", async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).send({ error: error });
   }
-})
+});
+
+async function getUserDataFromGithub(accessToken: string) {
+  // Implementar la lógica para obtener la información del usuario
+  try {
+    const userResponse = await axios.get(
+      "https://api.github.com/user",
+      {
+        headers:
+          { Authorization: `token ${accessToken}` }
+      });
+    return userResponse.data;
+  } catch (error) {
+    throw error;
+  }
+}
 
 async function saveTokensToDB(accessToken: string, refreshToken: string) {
   // Implementar la lógica para guardar los tokens en la base de datos

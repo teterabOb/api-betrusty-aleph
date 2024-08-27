@@ -16,13 +16,12 @@ const app = express();
 app.use(express.json());
 const router = express.Router();
 
-
 // Se debe enviar `worldid_email` en la url
 router.get("/login", (req: Request, res: Response) => {
   const { worldid_email } = req.query
 
   if (!worldid_email) {
-    return res.status(400).send({ message: "worldid_email not found" });
+    return res.status(400).send({ message: "state custom value not found" });
   }
 
   const baseUri = "https://github.com/login/oauth/authorize?client_id="
@@ -30,7 +29,8 @@ router.get("/login", (req: Request, res: Response) => {
   const redirectUri = ""
   const finalUri = `${baseUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${worldid_email}`
   // Se agrego state al final de la URL, esto se enviará a Github y luego se devolverá en el callback
-  const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback&state=${worldid_email}`;
+  const URL = finalUri
+  //`https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback&state=${worldid_email}`;
   return res.redirect(URL);
 });
 
@@ -39,7 +39,9 @@ router.get("/callback", async (req: Request, res: Response) => {
   console.log("worldid_email", state);
 
   if (!code || !state) {
-    res.status(400).send("Code not or state not found");
+    // Aquí tiene que redireccionar a una ruta de error
+    //return res.redirect("https://trusthub-ml.vercel.app/error");
+    res.status(400).send("Code or state not found");
   }
 
   try {
@@ -68,7 +70,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     const idUserString = idUser.rows[0].id_user;
 
     const githubInfoDBB: any = await userDBB.getGithubByUserId(idUserString);
-    console.log("githubInfoDBB", githubInfoDBB);
+    //console.log("githubInfoDBB", githubInfoDBB);
 
 
     if (githubInfoDBB.rowCount > 0) {

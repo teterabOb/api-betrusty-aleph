@@ -1,11 +1,15 @@
 import express from "express";
 import axios from "axios";
 import { Request, Response } from "express";
-import { GetGitHubEnv } from "../../../helpers/data/envData"
+import { GetMLEnv } from "../../../helpers/data/envData"
 
 const router = express.Router();
 
-const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
+const { 
+  ML_CLIENT_ID, 
+  ML_CLIENT_SECRET, 
+  ML_REDIRECT_URI 
+} = GetMLEnv();
 
 // Punto de entrada para generar el Token de autenticación
 router.get("/login", async (req: Request, res: Response) => {
@@ -28,7 +32,7 @@ router.get("/login", async (req: Request, res: Response) => {
   //http://localhost:3000/ml/login?worldid_email=blck@live.cl&country_code=CL
   //https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=$APP_ID&state=ABC123&redirect_uri=$REDIRECT_URL
   const mlAuthUrl = `https://auth.mercadolibre${countryCode}/authorization?`
-  const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${CLIENT_ID}&state=${worldid_email}&redirect_uri=${REDIRECT_URI}`;
+  const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${ML_CLIENT_ID}&state=${worldid_email}&redirect_uri=${ML_REDIRECT_URI}`;
   console.log("finalUrlMl", finalUrlMl);
   //const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&state=${worldid_email}`;
   return res.redirect(finalUrlMl);
@@ -39,7 +43,7 @@ router.get("/callback", async (req: Request, res: Response) => {
   const { code, state } = req.query;
   console.log("worldid_email", state);
 
-  if (!code || !state || typeof code !== "string" || CLIENT_ID === "" || CLIENT_SECRET === "") {
+  if (!code || !state || typeof code !== "string" || ML_CLIENT_ID === "" || ML_CLIENT_ID === "") {
     // Aqui tiene que redireccionar a una ruta de error
     //return res.redirect("/error");
     return res.status(400).send("Code or state not found");
@@ -48,10 +52,10 @@ router.get("/callback", async (req: Request, res: Response) => {
   try {
     const tokenResponse = await axios.post("https://github.com/login/oauth/access_token",
       {
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
+        client_id: ML_CLIENT_ID,
+        client_secret: ML_CLIENT_SECRET,
         code: code,
-        redirect_uri: REDIRECT_URI,
+        redirect_uri: ML_REDIRECT_URI,
       },
       {
         headers: {
@@ -62,8 +66,6 @@ router.get("/callback", async (req: Request, res: Response) => {
     const { access_token } = tokenResponse.data;
 
     //await saveTokensToDB(accessToken, refreshToken);
-
-
 
     const baseUrl = `https://trusthub-ml.vercel.app/`
     const url = `${baseUrl}profile?access_token=${access_token}&email=${state}`;
@@ -114,8 +116,8 @@ async function refreshAccessToken(refreshToken: string) {
   try {
     const tokenResponse = await axios.post("https://github.com/login/oauth/access_token",
       {
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
+        client_id: ML_CLIENT_ID,
+        client_secret: ML_CLIENT_SECRET,
         grant_type: "refresh_token",
         // The refresh token that you received when you generated a user access token.
         refresh_token: "",

@@ -24,10 +24,12 @@ router.get("/login", async (req: Request, res: Response) => {
   }else{
     countryCode = ".cl";
   }
-
+  // Ejemplo Request
+  //http://localhost:3000/ml/login?worldid_email=blck@live.cl&country_code=CL
   //https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=$APP_ID&state=ABC123&redirect_uri=$REDIRECT_URL
   const mlAuthUrl = `https://auth.mercadolibre${countryCode}/authorization?`
   const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${CLIENT_ID}&state=${worldid_email}&redirect_uri=${REDIRECT_URI}`;
+  console.log("finalUrlMl", finalUrlMl);
   //const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&state=${worldid_email}`;
   return res.redirect(finalUrlMl);
 });

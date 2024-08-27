@@ -85,7 +85,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     return res.redirect(`https://trusthub-ml.vercel.app?access_token=${access_token}&email=${state}`);
   } catch (error: any) {
     const errorDescription = error.response.data || error;
-    return res.status(500).send({ errorDescription });
+    return res.status(500).send( errorDescription );
     //return res.status(500).send({ error: "Error al obtener la información de Github" });
   }
 });

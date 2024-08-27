@@ -45,7 +45,6 @@ router.get("/callback", async (req: Request, res: Response) => {
   console.log("worldid_email", state);
   console.log("code", code);
 
-
   if (!code || !state) {
     // Aqui tiene que redireccionar a una ruta de error
     //return res.redirect("/error");

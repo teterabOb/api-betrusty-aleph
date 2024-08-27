@@ -72,7 +72,6 @@ router.get("/callback", async (req: Request, res: Response) => {
     const githubInfoDBB: any = await userDBB.getGithubByUserId(idUserString);
     //console.log("githubInfoDBB", githubInfoDBB);
 
-
     if (githubInfoDBB.rowCount > 0) {
       await userDBB.updateTokenGithub(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
     } else {

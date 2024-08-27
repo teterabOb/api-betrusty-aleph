@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import { Request, Response } from "express";
 import { GetMLEnv } from "../../../helpers/data/envData"
+import qs from 'qs';
 
 const router = express.Router();
 
@@ -40,43 +41,52 @@ router.get("/login", async (req: Request, res: Response) => {
 
 // Callback de la autenticación que consultará Github
 router.get("/callback", async (req: Request, res: Response) => {
-  console.log("ENTRAAA AL CALLBACK");
-  
-  console.log("callback : ", req.query);
+  //console.log("ENTRAAA AL CALLBACK");
+
   const { code, state } = req.query;
   console.log("worldid_email", state);
   console.log("code", code);
 
-  if (!code || !state) {
+  if (code === "" || state === "") {
     // Aqui tiene que redireccionar a una ruta de error
     //return res.redirect("/error");
     return res.status(400).send("Code or state not found");
   }
 
+  console.log("ML_CLIENT_ID", ML_CLIENT_ID);
+  console.log("ML_CLIENT_SECRET", ML_CLIENT_SECRET);
+  console.log("ML_REDIRECT_URI", ML_REDIRECT_URI);
+  console.log("code", code);
+  
   try {
-    const tokenResponse = await axios.post("https://github.com/login/oauth/access_token",
-      {
+    const tokenResponse = await axios.post(
+      "https://api.mercadolibre.com/oauth/token",
+      qs.stringify({
+        grant_type: "authorization_code",
         client_id: ML_CLIENT_ID,
         client_secret: ML_CLIENT_SECRET,
         code: code,
         redirect_uri: ML_REDIRECT_URI,
-      },
+        code_verifier: state
+      }),
       {
         headers: {
           Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
         },
       })
 
     const { access_token } = tokenResponse.data;
-    
-    //await saveTokensToDB(accessToken, refreshToken);
 
+    //await saveTokensToDB(accessToken, refreshToken);
     const baseUrl = `https://trusthub-ml.vercel.app/`
     const url = `${baseUrl}profile?access_token=${access_token}&email=${state}`;
     //return res.redirect(`/user-info?access_token=${access_token}`);
     return res.redirect(`https://trusthub-ml.vercel.app?access_token=${access_token}&email=${state}`);
-  } catch (error) {
-    return res.status(500).send({ error: error });
+  } catch (error: any) {
+    const errorDescription = error.response.data || error;
+    return res.status(500).send({ errorDescription });
+    //return res.status(500).send({ error: "Error al obtener la información de Github" });
   }
 });
 

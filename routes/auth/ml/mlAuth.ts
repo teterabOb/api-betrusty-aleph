@@ -35,12 +35,16 @@ router.get("/login", async (req: Request, res: Response) => {
   const mlAuthUrl = `https://auth.mercadolibre${countryCode}/authorization?`
   const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${ML_CLIENT_ID}&state=${worldid_email}&redirect_uri=${ML_REDIRECT_URI}`;
   console.log("finalUrlMl", finalUrlMl);
+  const finalUrlMlLocal = `http://localhost:3000/ml/callback?code=ML_CODE&state=${worldid_email}`; 
   //const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&state=${worldid_email}`;
   return res.redirect(finalUrlMl);
 });
 
 // Callback de la autenticación que consultará Github
 router.get("/callback", async (req: Request, res: Response) => {
+  console.log("ENTRAAA AL CALLBACK");
+  
+  console.log("callback : ", req.query);
   const { code, state } = req.query;
   console.log("worldid_email", state);
   console.log("code", code);

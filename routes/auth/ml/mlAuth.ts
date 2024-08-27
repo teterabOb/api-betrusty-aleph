@@ -5,10 +5,10 @@ import { GetMLEnv } from "../../../helpers/data/envData"
 
 const router = express.Router();
 
-const { 
-  ML_CLIENT_ID, 
-  ML_CLIENT_SECRET, 
-  ML_REDIRECT_URI 
+const {
+  ML_CLIENT_ID,
+  ML_CLIENT_SECRET,
+  ML_REDIRECT_URI
 } = GetMLEnv();
 
 // Punto de entrada para generar el Token de autenticación
@@ -21,11 +21,11 @@ router.get("/login", async (req: Request, res: Response) => {
 
   let countryCode = "";
 
-  if(country_code == "CL"){
+  if (country_code == "CL") {
     countryCode = ".cl";
-  }else if(country_code == "AR"){ 
+  } else if (country_code == "AR") {
     countryCode = ".com.ar";
-  }else{
+  } else {
     countryCode = ".cl";
   }
 
@@ -44,7 +44,7 @@ router.get("/callback", async (req: Request, res: Response) => {
   const { code, state } = req.query;
   console.log("worldid_email", state);
   console.log("code", code);
-  
+
 
   if (!code || !state) {
     // Aqui tiene que redireccionar a una ruta de error

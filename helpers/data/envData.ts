@@ -68,6 +68,5 @@ export const getEnvData = () => {
         ERC721ContractAddres: process.env.ERC721_CONTRACT_ADDRESS || "",
         MarketplaceContractAddress: process.env.MARKETPLACE_CONTRACT_ADDRESS || ""
     }
-
     return envData
 }

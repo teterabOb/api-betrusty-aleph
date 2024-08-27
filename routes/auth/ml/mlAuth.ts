@@ -32,6 +32,8 @@ router.get("/login", async (req: Request, res: Response) => {
 
   // Ejemplo Request
   //http://localhost:3000/ml/login?worldid_email=blck@live.cl&country_code=CL
+  //https://api-betrusty.vercel.app/ml/login?worldid_email=blck@live.cl&country_code=CL
+
   //https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=$APP_ID&state=ABC123&redirect_uri=$REDIRECT_URL
   const mlAuthUrl = `https://auth.mercadolibre${countryCode}/authorization?`
   const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${ML_CLIENT_ID}&state=${worldid_email}&redirect_uri=${ML_REDIRECT_URI}`;
@@ -79,8 +81,11 @@ router.get("/callback", async (req: Request, res: Response) => {
     const { access_token } = tokenResponse.data;
 
     //await saveTokensToDB(accessToken, refreshToken);
-    const baseUrl = `https://trusthub-ml.vercel.app/`
-    const url = `${baseUrl}profile?access_token=${access_token}&email=${state}`;
+
+    console.log("access_token", tokenResponse.data);
+    //const baseUrl = `https://trusthub-ml.vercel.app/`
+    //const url = `${baseUrl}profile?access_token=${access_token}&email=${state}`;
+
     //return res.redirect(`/user-info?access_token=${access_token}`);
     return res.redirect(`https://trusthub-ml.vercel.app?access_token=${access_token}&email=${state}`);
   } catch (error: any) {

@@ -42,6 +42,8 @@ router.get("/login", async (req: Request, res: Response) => {
 router.get("/callback", async (req: Request, res: Response) => {
   const { code, state } = req.query;
   console.log("worldid_email", state);
+  console.log("code", code);
+  
 
   if (!code || !state || typeof code !== "string" || ML_CLIENT_ID === "" || ML_CLIENT_ID === "") {
     // Aqui tiene que redireccionar a una ruta de error

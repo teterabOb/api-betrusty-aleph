@@ -66,12 +66,13 @@ router.get("/callback", async (req: Request, res: Response) => {
       })
 
     const { access_token } = tokenResponse.data;
-
+    
     //await saveTokensToDB(accessToken, refreshToken);
 
     const baseUrl = `https://trusthub-ml.vercel.app/`
     const url = `${baseUrl}profile?access_token=${access_token}&email=${state}`;
-    return res.redirect(`/user-info?access_token=${access_token}`);
+    //return res.redirect(`/user-info?access_token=${access_token}`);
+    return res.redirect(`https://trusthub-ml.vercel.app?access_token=${access_token}&email=${state}`);
   } catch (error) {
     return res.status(500).send({ error: error });
   }

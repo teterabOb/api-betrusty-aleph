@@ -28,6 +28,7 @@ router.get("/login", async (req: Request, res: Response) => {
   }else{
     countryCode = ".cl";
   }
+
   // Ejemplo Request
   //http://localhost:3000/ml/login?worldid_email=blck@live.cl&country_code=CL
   //https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=$APP_ID&state=ABC123&redirect_uri=$REDIRECT_URL
@@ -45,7 +46,7 @@ router.get("/callback", async (req: Request, res: Response) => {
   console.log("code", code);
   
 
-  if (!code || !state || typeof code !== "string" || ML_CLIENT_ID === "" || ML_CLIENT_ID === "") {
+  if (!code || !state) {
     // Aqui tiene que redireccionar a una ruta de error
     //return res.redirect("/error");
     return res.status(400).send("Code or state not found");

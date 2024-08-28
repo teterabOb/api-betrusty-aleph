@@ -88,10 +88,10 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const userData = userResponse;
     const data = userData.data;
+    const jsonMercadoLibre: MercadoLibre =  GenerateMercadoLibreJSON(data);
 
-    console.log(data);
+    console.log(jsonMercadoLibre);
     
-
     const { email, seller_reputation } = data;
 
     const user = await userDBB.getAllDataUserByEmail(state.toString());
@@ -138,6 +138,7 @@ router.get("/user-info", async (req: Request, res: Response) => {
 });
 
 function GenerateMercadoLibreJSON(data: any): MercadoLibre {
+
   return {
     mercado_libre_first_name: data.first_name,
     mercado_libre_last_name: data.last_name,

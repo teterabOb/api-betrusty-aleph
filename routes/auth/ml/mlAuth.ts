@@ -102,7 +102,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userData = userResponse;
     console.log("userData", userData);
 
-    return res.status(200).json(userData);
+    return res.status(200).send(userData);
   } catch (error: any) {
     console.error("Error:", error.response ? error.response.data : error.message);
     return res.status(500).send(error.response ? error.response.data : error.message);

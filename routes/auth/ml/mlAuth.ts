@@ -35,6 +35,8 @@ router.get("/login", async (req: Request, res: Response) => {
   //http://localhost:3000/ml/login?worldid_email=blck@live.cl&country_code=CL
   //https://api-betrusty.vercel.app/ml/login?worldid_email=blck@live.cl&country_code=CL
 
+  //https://api-betrusty.vercel.app/ml/login?worldid_email=0x2a06572cd2ac0543130e4f6d42b53dc5d4a139d39967acdefc6138ad4553ccae@id.worldcoin.org&country_code=CL
+  
   //https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=$APP_ID&state=ABC123&redirect_uri=$REDIRECT_URL
   const mlAuthUrl = `https://auth.mercadolibre${countryCode}/authorization?`
   const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${ML_CLIENT_ID}&state=${worldid_email}&redirect_uri=${ML_REDIRECT_URI}`;
@@ -50,9 +52,6 @@ router.get("/callback", async (req: Request, res: Response) => {
     return res.status(400).send("Code or state not found");
   }
 
-  console.log("code", code);
-  console.log("state", state);
-  
   try {
     // Obtener el token de acceso
     const tokenResponse = await axios.post(
@@ -74,8 +73,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     );
 
     const { access_token } = tokenResponse.data;
-    //console.log("access_token", access_token);
-
+    
     if (!access_token) {
       return res.status(400).send("Access token not found");
     }
@@ -98,18 +96,25 @@ router.get("/callback", async (req: Request, res: Response) => {
     // Obtener Info Usuario desde DBB
     console.log("state", state);
 
-    const user = await userDBB.getUserByEmail(state.toString());
-    console.log("user", user);
+    const user = await userDBB.getAllDataUserByEmail(state.toString());
+    //console.log("user", user);
 
     if (user.rowCount == 0) {
       return res.status(400).send({ message: `Usuario con correo ${code} no encontrado` });
     }
 
-    const userML = await userDBB.getUserMLByEmail(email);
+    const id_user = user.rows[0].id_user;
+    const did_user = user.rows[0].did;
+
+
+    const userML = await userDBB.getUserMLByEmail(id_user.toString());
 
     if(userML.rowCount == 0){ 
-      //await userDBB.saveUserML(email, seller_reputation, state.toString());
+      await userDBB.saveUserML(email, did_user,seller_reputation, state.toString());
+    }else{
+      //await userDBB.updateUserML(email, seller_reputation, state.toString());
     }
+
     //console.log("email", email);
     //console.log("seller_reputation", seller_reputation);
     return res.status(200).send({ message: data });

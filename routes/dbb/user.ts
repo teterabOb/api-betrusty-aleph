@@ -17,8 +17,8 @@ export interface Tokens {
     email: string;
 }
 
-const saveTokens = async (idUser: string, did: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {
-    if (idUser === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)
+const saveTokens = async (id_user: string, did: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {
+    if (id_user === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)
         return new CustomError("Missing parameters", 400);
 
     try {
@@ -32,7 +32,7 @@ const saveTokens = async (idUser: string, did: string, accessToken: string, expi
         REFRESH_TOKEN_EXPIRES_IN,
         EMAIL
         )
-        VALUES(${idUser},${did}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
+        VALUES(${id_user},${did}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
         return result
     } catch (error) {
         console.log(error);
@@ -40,8 +40,8 @@ const saveTokens = async (idUser: string, did: string, accessToken: string, expi
     }
 }
 
-const saveTokensWorldID = async (idUser: string, access_token: string, token_type: string, expires_in: string, scope: string, id_token: string, email: string) => {
-    if (idUser === undefined || access_token === undefined || token_type === undefined || expires_in === undefined || scope === undefined || id_token === undefined)
+const saveTokensWorldID = async (id_user: string, access_token: string, token_type: string, expires_in: string, scope: string, id_token: string, email: string) => {
+    if (id_user === undefined || access_token === undefined || token_type === undefined || expires_in === undefined || scope === undefined || id_token === undefined)
         return new CustomError("Missing parameters", 400);
 
     try {
@@ -55,7 +55,7 @@ const saveTokensWorldID = async (idUser: string, access_token: string, token_typ
         ID_TOKEN,
         EMAIL
         )
-        VALUES(${idUser}, ${access_token}, ${token_type}, ${expires_in}, ${scope}, ${id_token}, ${email});`;
+        VALUES(${id_user}, ${access_token}, ${token_type}, ${expires_in}, ${scope}, ${id_token}, ${email});`;
         return result
     } catch (error) {
         console.log(error);
@@ -63,7 +63,7 @@ const saveTokensWorldID = async (idUser: string, access_token: string, token_typ
     }
 }
 
-const updateTokenGithub = async (idUser: string,
+const updateTokenGithub = async (id_user: string,
     accessToken: string, expires_in: string,
     refresh_token: string,
     refresh_token_expires_in: string,
@@ -82,7 +82,7 @@ const updateTokenGithub = async (idUser: string,
     }
 }
 
-const updateTokenWorldID = async (idUser: string, access_token: string, token_type: string, expires_in: string, scope: string, id_token: string) => {
+const updateTokenWorldID = async (id_user: string, access_token: string, token_type: string, expires_in: string, scope: string, id_token: string) => {
     try {
         const result = await sql`UPDATE WorldID 
         SET ACCESS_TOKEN = ${access_token}, 
@@ -90,7 +90,7 @@ const updateTokenWorldID = async (idUser: string, access_token: string, token_ty
         EXPIRES_IN = ${expires_in}, 
         SCOPE = ${scope}, 
         ID_TOKEN = ${id_token}
-        WHERE ID_USER = ${Number(idUser)};`;
+        WHERE ID_USER = ${Number(id_user)};`;
         return result
     } catch (error) {
         console.log(error);
@@ -98,9 +98,9 @@ const updateTokenWorldID = async (idUser: string, access_token: string, token_ty
     }
 }
 
-const getUser = async (email: string) => {
+const getUserMLByEmail = async (id_user: string) => {
     try {
-        const result = await sql`SELECT * FROM MercadoLibre WHERE EMAIL = ${email};`;
+        const result = await sql`SELECT * FROM MercadoLibre WHERE id_user = ${id_user};`;
         return result;
     } catch (error) {
         console.log(error);
@@ -108,7 +108,7 @@ const getUser = async (email: string) => {
     }
 }
 
-const getUserMLByEmail = async (email: string) => { 
+const getUser = async (email: string) => {
     try {
         const result = await sql`SELECT * FROM Users WHERE EMAIL = ${email};`;
         return result;
@@ -148,6 +148,16 @@ const getUserByEmail = async (email: string) => {
     }
 }
 
+const getAllDataUserByEmail = async (email: string) => {
+    try {
+        const result = await sql`SELECT * FROM Users WHERE EMAIL = ${email};`;
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw new CustomError("Error getting user", 500);
+    }
+}
+
 const saveUser = async (did: string, name: string = "anon", email: string) => {
     try {
         const result = await sql`INSERT INTO 
@@ -156,6 +166,23 @@ const saveUser = async (did: string, name: string = "anon", email: string) => {
         NAME, 
         EMAIL)
         VALUES(${did}, ${name}, ${email});`;
+        return result
+    } catch (error) {
+        console.log(error);
+        throw new CustomError("Error saving user", 500);
+    }
+}
+
+const saveUserML = async (id_user: string, did: string, data: string, email: string) => { 
+    try {
+        const jsonData = JSON.stringify(data);
+        const result = await sql`INSERT INTO 
+        MercadoLibre( 
+        ID_USER, 
+        DID, 
+        DATA, 
+        EMAIL)
+        VALUES(${id_user}, ${did}, ${data}, ${email});`;
         return result
     } catch (error) {
         console.log(error);
@@ -174,5 +201,7 @@ export default
         updateTokenWorldID,
         getUserByEmail,
         getGithubByUserId,
-        getUserMLByEmail
+        getUserMLByEmail,
+        saveUserML,
+        getAllDataUserByEmail
     }; 

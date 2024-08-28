@@ -85,7 +85,7 @@ router.get("/callback", async (req: Request, res: Response) => {
       try {
         const userResponse = await axios.get("https://api.mercadolibre.com/users/me", { headers: { Authorization: `token ${access_token}` } });
         const userData = userResponse.data;
-        return res.json(userData);
+        return res.status(200).send(userData);
       } catch (error) {
         return res.status(500).send({ error: error });
       }
@@ -99,7 +99,7 @@ router.get("/callback", async (req: Request, res: Response) => {
       }
     );
 
-    const userData = userResponse.data;
+    const userData = userResponse;
     console.log("userData", userData);
 
     return res.status(200).json(userData);

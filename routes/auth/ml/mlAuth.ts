@@ -82,8 +82,8 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     try {
       const userResponse = await axios.get(
-        "https://api.github.com/user", 
-        { headers: { Authorization: `token ${access_token}` } 
+        "https://api.github.com/users/me", 
+        { headers: { Authorization: `Bearer ${access_token}` } 
       });
       const userData = userResponse.data;
       console.log("USER RESPONSE");
@@ -101,8 +101,9 @@ router.get("/callback", async (req: Request, res: Response) => {
     //const baseUrl = `https://trusthub-ml.vercel.app/`
     //const url = `${baseUrl}profile?access_token=${access_token}&email=${state}`;
 
+    return res.status(200).send(tokenResponse);
     //return res.redirect(`/user-info?access_token=${access_token}`);
-    return res.redirect(`https://trusthub-ml.vercel.app?access_token=${access_token}&email=${state}`);
+    //return res.redirect(`https://trusthub-ml.vercel.app?access_token=${access_token}&email=${state}`);
   } catch (error: any) {
     const errorDescription = error.response.data || error;
     return res.status(500).send( errorDescription );

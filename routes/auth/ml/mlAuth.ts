@@ -81,13 +81,15 @@ router.get("/callback", async (req: Request, res: Response) => {
     const { access_token } = tokenResponse.data;
     console.log("access_token", access_token);
     
-
     try {
       const userResponse = await axios.get(
         "https://api.github.com/users/me",
         {
-          headers: { Authorization: `Bearer ${access_token}` }
+          headers: { 
+            Authorization: `Bearer ${access_token}` 
+          }
         });
+
       const userData = userResponse.data;
       console.log("USER RESPONSE");
       console.log("userResponse", userResponse);
@@ -96,6 +98,8 @@ router.get("/callback", async (req: Request, res: Response) => {
 
       //return res.json(userData);
     } catch (error) {
+      console.log("ERROR");
+      console.log("error", error);
       return res.status(500).send({ error: "Error obteniendo la info del usuario" });
     }
     //await saveTokensToDB(accessToken, refreshToken);

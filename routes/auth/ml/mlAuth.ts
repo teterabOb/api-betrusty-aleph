@@ -108,11 +108,13 @@ router.get("/callback", async (req: Request, res: Response) => {
 
 
     const userML = await userDBB.getUserMLByEmail(id_user.toString());
+    console.log(userML)
 
     if(userML.rowCount == 0){ 
       await userDBB.saveUserML(id_user, did_user,seller_reputation, state.toString());
     }else{
-      console.log(userML)
+      console.log();
+      
       //await userDBB.updateUserML(email, seller_reputation, state.toString());
     }
 

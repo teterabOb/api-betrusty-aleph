@@ -100,7 +100,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     );
 
     const userData = userResponse;
-    console.log(userData);
+    console.log(userData.data);
 
     return res.status(200).send({ message: "User data fetched successfully" });
   } catch (error: any) {

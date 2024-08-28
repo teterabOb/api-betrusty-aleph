@@ -53,8 +53,8 @@ router.get("/callback", async (req: Request, res: Response) => {
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse;
 
     const userDataFromGithub = await getUserDataFromGithub(access_token);
-    console.log("userDataFromGithub", userDataFromGithub);
-    const jsonGithub = GenerateGithubJSON(userDataFromGithub)
+    //console.log("userDataFromGithub", userDataFromGithub);
+    const jsonGithub: Github = GenerateGithubJSON(userDataFromGithub)
     //console.log("jsonGithub", jsonGithub);
     
     const email = userDataFromGithub.email;
@@ -76,9 +76,9 @@ router.get("/callback", async (req: Request, res: Response) => {
     const githubInfoDBB: any = await userDBB.getGithubByUserId(idUserString);
 
     if (githubInfoDBB.rowCount > 0) {
-      await userDBB.updateTokenGithub(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.updateTokenGithub(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email, jsonGithub);
     } else {
-      await userDBB.saveTokens(idUserString, did, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.saveTokens(idUserString, did, access_token, expires_in, refresh_token, refresh_token_expires_in, email, jsonGithub);
     }
 
     const baseUrl = `https://trusthub-ml.vercel.app/`

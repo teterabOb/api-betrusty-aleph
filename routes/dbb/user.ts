@@ -1,4 +1,6 @@
 import { sql } from "@vercel/postgres";
+import { Github } from "../../interfaces/Github";
+import { MercadoLibre } from "../../interfaces/MercadoLibre";
 
 // Clase de error personalizada
 class CustomError extends Error {
@@ -18,11 +20,21 @@ export interface Tokens {
 }
 */
 
-const saveTokens = async (id_user: string, did: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {
+const saveTokens = async (
+    id_user: string, 
+    did: string, 
+    accessToken: string, 
+    expires_in: string, 
+    refresh_token: string, 
+    refresh_token_expires_in: string, 
+    email: string, 
+    data: Github) => {
+
     if (id_user === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)
         return new CustomError("Missing parameters", 400);
 
     try {
+        const jsonData = JSON.stringify(data)
         const result = await sql`INSERT INTO 
         Github( 
         ID_USER,
@@ -31,9 +43,10 @@ const saveTokens = async (id_user: string, did: string, accessToken: string, exp
         EXPIRES_IN, 
         REFRESH_TOKEN, 
         REFRESH_TOKEN_EXPIRES_IN,
-        EMAIL
+        EMAIL,
+        DATA
         )
-        VALUES(${id_user},${did}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email});`;
+        VALUES(${id_user},${did}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email}, ${jsonData});`;
         return result
     } catch (error) {
         console.log(error);
@@ -68,13 +81,16 @@ const updateTokenGithub = async (id_user: string,
     accessToken: string, expires_in: string,
     refresh_token: string,
     refresh_token_expires_in: string,
-    email: string) => {
+    email: string,
+    data: Github) => {
     try {
+        const jsonData = JSON.stringify(data)
         const result = await sql`UPDATE Github 
         SET ACCESS_TOKEN = ${accessToken}, 
         EXPIRES_IN = ${expires_in}, 
         REFRESH_TOKEN = ${refresh_token}, 
-        REFRESH_TOKEN_EXPIRES_IN = ${refresh_token_expires_in}
+        REFRESH_TOKEN_EXPIRES_IN = ${refresh_token_expires_in},
+        DATA = ${jsonData}
         WHERE EMAIL = ${email};`;
         return result
     } catch (error) {

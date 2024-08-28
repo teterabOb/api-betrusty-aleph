@@ -94,7 +94,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     const { email, seller_reputation } = data;
 
     // Obtener Info Usuario desde DBB
-    console.log("state", state);
+    //console.log("state", state);
 
     const user = await userDBB.getAllDataUserByEmail(state.toString());
     //console.log("user", user);
@@ -112,6 +112,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     if(userML.rowCount == 0){ 
       await userDBB.saveUserML(id_user, did_user,seller_reputation, state.toString());
     }else{
+      console.log(userML)
       //await userDBB.updateUserML(email, seller_reputation, state.toString());
     }
 

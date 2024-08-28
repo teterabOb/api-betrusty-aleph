@@ -59,7 +59,7 @@ router.get("/callback", async (req: Request, res: Response) => {
   console.log("ML_CLIENT_SECRET", ML_CLIENT_SECRET);
   console.log("ML_REDIRECT_URI", ML_REDIRECT_URI);
   console.log("code", code);
-  
+
   try {
     const tokenResponse = await axios.post(
       "https://api.mercadolibre.com/oauth/token",
@@ -79,18 +79,21 @@ router.get("/callback", async (req: Request, res: Response) => {
       })
 
     const { access_token } = tokenResponse.data;
+    console.log("access_token", access_token);
+    
 
     try {
       const userResponse = await axios.get(
-        "https://api.github.com/users/me", 
-        { headers: { Authorization: `Bearer ${access_token}` } 
-      });
+        "https://api.github.com/users/me",
+        {
+          headers: { Authorization: `Bearer ${access_token}` }
+        });
       const userData = userResponse.data;
       console.log("USER RESPONSE");
       console.log("userResponse", userResponse);
       console.log("USER DATA");
       console.log("userData", userData);
-      
+
       //return res.json(userData);
     } catch (error) {
       return res.status(500).send({ error: "Error obteniendo la info del usuario" });
@@ -106,7 +109,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     //return res.redirect(`https://trusthub-ml.vercel.app?access_token=${access_token}&email=${state}`);
   } catch (error: any) {
     const errorDescription = error.response.data || error;
-    return res.status(500).send( errorDescription );
+    return res.status(500).send(errorDescription);
     //return res.status(500).send({ error: "Error al obtener la información de Github" });
   }
 });

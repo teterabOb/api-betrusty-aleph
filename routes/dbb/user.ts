@@ -186,9 +186,7 @@ const saveUser = async (did: string, name: string = "anon", email: string) => {
     }
 }
 
-const saveUserML = async (id_user: string, did: string, data: string, email: string) => { 
-    console.log("saveUserML : ", email);
-    
+const saveUserML = async (id_user: string, did: string, data: string, email: string) => {     
     try {
         const jsonData = JSON.stringify(data);
         const result = await sql`INSERT INTO 

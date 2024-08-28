@@ -12,6 +12,7 @@ router.get("/", async (_req: Request, res: Response) => {
         Github(
         ID_USER BIGINT NOT NULL, 
         DID VARCHAR(150) NOT NULL,
+        DATA JSONB,
         ACCESS_TOKEN VARCHAR(150) NOT NULL, 
         EXPIRES_IN VARCHAR(150), 
         REFRESH_TOKEN VARCHAR(150), 

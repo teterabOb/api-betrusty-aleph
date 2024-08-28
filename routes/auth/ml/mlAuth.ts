@@ -92,7 +92,7 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     console.log(jsonMercadoLibre);
     
-    const { email, seller_reputation } = data;
+    const { email } = data;
 
     const user = await userDBB.getAllDataUserByEmail(state.toString());
 

@@ -182,7 +182,7 @@ const saveUserML = async (id_user: string, did: string, data: string, email: str
         DID, 
         DATA, 
         EMAIL)
-        VALUES(${id_user}, ${did}, ${data}, ${email});`;
+        VALUES(${id_user}, ${did}, ${jsonData}, ${email});`;
         return result
     } catch (error) {
         console.log(error);

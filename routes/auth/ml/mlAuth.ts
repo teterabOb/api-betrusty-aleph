@@ -100,9 +100,9 @@ router.get("/callback", async (req: Request, res: Response) => {
     );
 
     const userData = userResponse;
-    console.log("userData", userData);
+    console.log(userData);
 
-    return res.status(200).send(userData);
+    return res.status(200).send({ message: "User data fetched successfully" });
   } catch (error: any) {
     console.error("Error:", error.response ? error.response.data : error.message);
     return res.status(500).send(error.response ? error.response.data : error.message);

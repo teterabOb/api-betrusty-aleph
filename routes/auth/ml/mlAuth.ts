@@ -36,7 +36,7 @@ router.get("/login", async (req: Request, res: Response) => {
   //https://api-betrusty.vercel.app/ml/login?worldid_email=blck@live.cl&country_code=CL
 
   //https://api-betrusty.vercel.app/ml/login?worldid_email=0x2a06572cd2ac0543130e4f6d42b53dc5d4a139d39967acdefc6138ad4553ccae@id.worldcoin.org&country_code=CL
-  
+
   //https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=$APP_ID&state=ABC123&redirect_uri=$REDIRECT_URL
   const mlAuthUrl = `https://auth.mercadolibre${countryCode}/authorization?`
   const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${ML_CLIENT_ID}&state=${worldid_email}&redirect_uri=${ML_REDIRECT_URI}`;
@@ -73,7 +73,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     );
 
     const { access_token } = tokenResponse.data;
-    
+
     if (!access_token) {
       return res.status(400).send("Access token not found");
     }
@@ -110,17 +110,15 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userML = await userDBB.getUserMLByEmail(id_user.toString());
     //console.log(userML)
 
-    if(userML.rowCount == 0){ 
-      await userDBB.saveUserML(id_user, did_user,seller_reputation, state.toString());
-    }else{
+    if (userML.rowCount == 0) {
+      await userDBB.saveUserML(id_user, did_user, seller_reputation, state.toString());
+    } else {
       //console.log("updateUserML");
       //const sellerRepurationDBB = userML.rows[0].data;
       //console.log("sellerRepurationDBB", sellerRepurationDBB);
       await userDBB.updateUserML(id_user, seller_reputation);
     }
 
-    //console.log("email", email);
-    //console.log("seller_reputation", seller_reputation);
     return res.status(200).send({ message: data });
   } catch (error: any) {
     console.error("Error:", error.response ? error.response.data : error.message);
@@ -128,15 +126,21 @@ router.get("/callback", async (req: Request, res: Response) => {
   }
 });
 
-/*
-async function getInfoMLFromDBB(email: string){
-  try {
-    const response = await userDBB.getUserMLByEmail(email);
-  } catch (error: any) {
-    
+router.get("/user-info", async (req: Request, res: Response) => {
+  const { access_token } = req.query;
+
+  if (!access_token) {
+    return res.status(400).send("Access token not found");
   }
-}
-*/
+
+  try {
+    const userResponse = await axios.get("https://api.mercadolibre.com/users/me", { headers: { Authorization: `token ${access_token}` } });
+    const userData = userResponse.data;
+    return res.status(200).send(userData);
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+});
 
 async function saveTokensToDB(accessToken: string, refreshToken: string) {
   // Implementar la lógica para guardar los tokens en la base de datos
@@ -163,21 +167,7 @@ async function refreshAccessToken(refreshToken: string) {
   }
 }
 
-router.get("/user-info", async (req: Request, res: Response) => {
-  const { access_token } = req.query;
 
-  if (!access_token) {
-    return res.status(400).send("Access token not found");
-  }
-
-  try {
-    const userResponse = await axios.get("https://api.mercadolibre.com/users/me", { headers: { Authorization: `token ${access_token}` } });
-    const userData = userResponse.data;
-    return res.status(200).send(userData);
-  } catch (error) {
-    return res.status(500).send({ error: error });
-  }
-});
 
 export default router;
 

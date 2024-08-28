@@ -98,6 +98,19 @@ const updateTokenWorldID = async (id_user: string, access_token: string, token_t
     }
 }
 
+const updateUserML = async (id_user: string, data: string) => {
+    try {
+        const jsonData = JSON.stringify(data);
+        const result = await sql`UPDATE MercadoLibre 
+        SET DATA = ${jsonData}
+        WHERE ID_USER = ${id_user};`;
+        return result
+    } catch (error) {
+        console.log(error);
+        throw new CustomError("Error updating user updateUserML", 500);
+    }
+}
+
 const getUserMLByEmail = async (id_user: string) => {
     try {
         const result = await sql`SELECT * FROM MercadoLibre WHERE id_user = ${id_user};`;
@@ -205,5 +218,6 @@ export default
         getGithubByUserId,
         getUserMLByEmail,
         saveUserML,
-        getAllDataUserByEmail
+        getAllDataUserByEmail,
+        updateUserML
     }; 

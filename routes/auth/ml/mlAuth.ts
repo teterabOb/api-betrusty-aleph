@@ -106,9 +106,9 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userML = await userDBB.getUserMLIdUser(id_user.toString());
 
     if (userML.rowCount == 0) {
-      await userDBB.saveUserML(id_user, did_user, JSON.stringify(jsonMercadoLibre), state.toString() );
+      await userDBB.saveUserML(id_user, did_user, jsonMercadoLibre, state.toString() );
     } else {
-      await userDBB.updateUserML(id_user, JSON.stringify(jsonMercadoLibre));
+      await userDBB.updateUserML(id_user, jsonMercadoLibre);
     }
 
     const baseUrl = `https://trusthub-ml.vercel.app/`

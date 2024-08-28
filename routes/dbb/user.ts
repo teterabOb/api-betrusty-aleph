@@ -7,7 +7,7 @@ class CustomError extends Error {
         this.name = "CustomError";
     }
 }
-
+/*
 export interface Tokens {
     idUser: string;
     accessToken: string;
@@ -16,6 +16,7 @@ export interface Tokens {
     refresh_token_expires_in: string;
     email: string;
 }
+*/
 
 const saveTokens = async (id_user: string, did: string, accessToken: string, expires_in: string, refresh_token: string, refresh_token_expires_in: string, email: string) => {
     if (id_user === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)

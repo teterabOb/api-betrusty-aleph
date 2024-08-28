@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import express, { Request, Response } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
+import { Github } from "../../../interfaces/Github";
 import userDBB from "../../dbb/user";
 
 interface TokenResponse {
@@ -51,8 +52,8 @@ router.get("/callback", async (req: Request, res: Response) => {
     const tokenResponse = await getTokenFromGithub(code as string);
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse;
 
-
     const userDataFromGithub = await getUserDataFromGithub(access_token);
+    console.log("userDataFromGithub", userDataFromGithub);
     const email = userDataFromGithub.email;
 
     if (!email) {
@@ -60,7 +61,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     const idUser = await userDBB.getUserByEmail(emailInput);
-    console.log("idUser", idUser);
+    //console.log("idUser", idUser);
 
     if (idUser.rowCount === 0) {
       return res.status(400).send("User not found in Trusthub");
@@ -70,7 +71,6 @@ router.get("/callback", async (req: Request, res: Response) => {
     const idUserString = idUser.rows[0].id_user;
 
     const githubInfoDBB: any = await userDBB.getGithubByUserId(idUserString);
-    //console.log("githubInfoDBB", githubInfoDBB);
 
     if (githubInfoDBB.rowCount > 0) {
       await userDBB.updateTokenGithub(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
@@ -109,6 +109,18 @@ async function getTokenFromGithub(code: string) {
   } catch (error) {
     console.error("Error fetching access token:", error);
     throw new Error("Failed to fetch access token");
+  }
+}
+
+function GenerateGithubJSON(data: any): Github { 
+  return {
+    github_login: data.login,
+    github_public_repos: data.public_repos,
+    github_public_gists: data.public_gists,
+    github_followers: data.followers,
+    github_following: data.following,
+    github_created_at: data.created_at,
+    github_collaborators: data.collaborators,
   }
 }
 

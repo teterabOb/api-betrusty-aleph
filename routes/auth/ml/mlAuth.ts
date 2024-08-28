@@ -3,6 +3,7 @@ import axios from "axios";
 import { Request, Response } from "express";
 import { GetMLEnv } from "../../../helpers/data/envData"
 import userDBB from "../../dbb/user";
+import { MercadoLibre } from "../../../interfaces/MercadoLibre";
 import qs from 'qs';
 
 const router = express.Router();

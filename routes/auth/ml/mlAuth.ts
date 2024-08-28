@@ -83,7 +83,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     
     try {
       const userResponse = await axios.get(
-        "https://api.github.com/users/me",
+        "https://api.mercadolibre.com/users/me",
         {
           headers: { 
             Authorization: `Bearer ${access_token}` 
@@ -127,7 +127,7 @@ router.get("/user-info", async (req: Request, res: Response) => {
   }
 
   try {
-    const userResponse = await axios.get("https://api.github.com/user", { headers: { Authorization: `token ${access_token}` } });
+    const userResponse = await axios.get("https://api.mercadolibre.com/users/me", { headers: { Authorization: `token ${access_token}` } });
     const userData = userResponse.data;
     return res.json(userData);
   } catch (error) {

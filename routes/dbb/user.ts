@@ -1,6 +1,4 @@
 import { sql } from "@vercel/postgres";
-import { Github } from "../../interfaces/Github";
-import { MercadoLibre } from "../../interfaces/MercadoLibre";
 
 // Clase de error personalizada
 class CustomError extends Error {
@@ -9,25 +7,15 @@ class CustomError extends Error {
         this.name = "CustomError";
     }
 }
-/*
-export interface Tokens {
-    idUser: string;
-    accessToken: string;
-    expires_in: string;
-    refresh_token: string;
-    refresh_token_expires_in: string;
-    email: string;
-}
-*/
 
 const saveTokens = async (
-    id_user: string, 
-    did: string, 
-    accessToken: string, 
-    expires_in: string, 
-    refresh_token: string, 
-    refresh_token_expires_in: string, 
-    email: string, 
+    id_user: string,
+    did: string,
+    accessToken: string,
+    expires_in: string,
+    refresh_token: string,
+    refresh_token_expires_in: string,
+    email: string,
     data: string) => {
 
     if (id_user === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)
@@ -83,7 +71,6 @@ const updateTokenGithub = async (id_user: string,
     email: string,
     data: string) => {
     try {
-        //const jsonData = JSON.stringify(data)
         const result = await sql`UPDATE Github 
         SET ACCESS_TOKEN = ${accessToken}, 
         EXPIRES_IN = ${expires_in}, 
@@ -116,7 +103,6 @@ const updateTokenWorldID = async (id_user: string, access_token: string, token_t
 
 const updateUserML = async (id_user: string, data: string) => {
     try {
-        //const jsonData = JSON.stringify(data);
         const result = await sql`UPDATE MercadoLibre 
         SET DATA = ${data}
         WHERE ID_USER = ${id_user};`;
@@ -202,7 +188,7 @@ const saveUser = async (did: string, name: string = "anon", email: string) => {
     }
 }
 
-const saveUserML = async (id_user: string, did: string, data: string, email: string) => {     
+const saveUserML = async (id_user: string, did: string, data: string, email: string) => {
     try {
         const jsonData = JSON.stringify(data);
         const result = await sql`INSERT INTO 

@@ -169,7 +169,7 @@ const saveUser = async (did: string, name: string = "anon", email: string) => {
         return result
     } catch (error) {
         console.log(error);
-        throw new CustomError("Error saving user", 500);
+        throw new CustomError("Error saving user: saveUser", 500);
     }
 }
 
@@ -186,7 +186,7 @@ const saveUserML = async (id_user: string, did: string, data: string, email: str
         return result
     } catch (error) {
         console.log(error);
-        throw new CustomError("Error saving user", 500);
+        throw new CustomError("Error saving user : saveUserML", 500);
     }
 }
 

@@ -28,13 +28,12 @@ const saveTokens = async (
     refresh_token: string, 
     refresh_token_expires_in: string, 
     email: string, 
-    data: Github) => {
+    data: string) => {
 
     if (id_user === undefined || accessToken === undefined || expires_in === undefined || refresh_token === undefined || refresh_token_expires_in === undefined || email === undefined)
         return new CustomError("Missing parameters", 400);
 
     try {
-        const jsonData = JSON.stringify(data)
         const result = await sql`INSERT INTO 
         Github( 
         ID_USER,
@@ -46,7 +45,7 @@ const saveTokens = async (
         EMAIL,
         DATA
         )
-        VALUES(${id_user},${did}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email}, ${jsonData});`;
+        VALUES(${id_user},${did}, ${accessToken}, ${expires_in}, ${refresh_token}, ${refresh_token_expires_in}, ${email}, ${data});`;
         return result
     } catch (error) {
         console.log(error);

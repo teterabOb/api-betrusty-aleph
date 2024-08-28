@@ -54,8 +54,8 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const userDataFromGithub = await getUserDataFromGithub(access_token);
     //console.log("userDataFromGithub", userDataFromGithub);
-    const jsonGithub: Github = GenerateGithubJSON(userDataFromGithub)
-    //console.log("jsonGithub", jsonGithub);
+    const objectGithub: Github = GenerateGithubJSON(userDataFromGithub)
+    const jsonGithub = JSON.stringify(objectGithub);
     
     const email = userDataFromGithub.email;
 

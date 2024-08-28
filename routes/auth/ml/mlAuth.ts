@@ -89,7 +89,7 @@ router.get("/callback", async (req: Request, res: Response) => {
       //console.log("USER RESPONSE");
       //console.log("userResponse", userResponse);
       //console.log("USER DATA");
-      //console.log("userData", userData);
+      console.log("userData", userData);
 
       //return res.json(userData);
     } catch (error: any) {

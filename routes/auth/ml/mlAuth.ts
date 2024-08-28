@@ -103,6 +103,10 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     const userML = await userDBB.getUserMLByEmail(email);
+    
+    if(userML.rowCount == 0){ 
+      //await userDBB.saveUserML(email, seller_reputation, state.toString());
+    }
     //console.log("email", email);
     //console.log("seller_reputation", seller_reputation);
     return res.status(200).send({ message: data });

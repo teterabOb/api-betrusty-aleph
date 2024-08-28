@@ -88,9 +88,9 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const userData = userResponse;
     const data = userData.data;
-    const jsonMercadoLibre: MercadoLibre =  GenerateMercadoLibreJSON(data);
-
-    console.log(jsonMercadoLibre);
+    const objectMercadoLibre: MercadoLibre =  GenerateMercadoLibreJSON(data);
+    const jsonMercadoLibre = JSON.stringify(objectMercadoLibre);
+    
     
     const { email } = data;
 

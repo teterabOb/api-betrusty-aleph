@@ -113,7 +113,7 @@ const updateUserML = async (id_user: string, data: string) => {
     }
 }
 
-const getUserMLByEmail = async (id_user: string) => {
+const getUserMLIdUser = async (id_user: string) => {
     try {
         const result = await sql`SELECT * FROM MercadoLibre WHERE id_user = ${id_user};`;
         return result;
@@ -216,7 +216,7 @@ export default
         updateTokenWorldID,
         getUserByEmail,
         getGithubByUserId,
-        getUserMLByEmail,
+        getUserMLIdUser,
         saveUserML,
         getAllDataUserByEmail,
         updateUserML

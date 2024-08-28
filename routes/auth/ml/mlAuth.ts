@@ -103,7 +103,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     const id_user = user.rows[0].id_user;
     const did_user = user.rows[0].did;
 
-    const userML = await userDBB.getUserMLByEmail(id_user.toString());
+    const userML = await userDBB.getUserMLIdUser(id_user.toString());
 
     if (userML.rowCount == 0) {
       await userDBB.saveUserML(id_user, did_user, JSON.stringify(jsonMercadoLibre), state.toString() );

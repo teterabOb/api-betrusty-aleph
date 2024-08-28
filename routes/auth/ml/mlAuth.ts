@@ -89,6 +89,9 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userData = userResponse;
     const data = userData.data;
 
+    console.log(data);
+    
+
     const { email, seller_reputation } = data;
 
     const user = await userDBB.getAllDataUserByEmail(state.toString());
@@ -101,7 +104,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     const did_user = user.rows[0].did;
 
     const userML = await userDBB.getUserMLByEmail(id_user.toString());
-    
+
     if (userML.rowCount == 0) {
       await userDBB.saveUserML(id_user, did_user, seller_reputation, state.toString());
     } else {
@@ -133,6 +136,27 @@ router.get("/user-info", async (req: Request, res: Response) => {
     return res.status(500).send({ error: error });
   }
 });
+
+function GenerateMercadoLibreJSON(data: any): MercadoLibre {
+  return {
+    mercado_libre_first_name: data.first_name,
+    mercado_libre_last_name: data.last_name,
+    mercado_libre_email: data.email,
+    mercado_libre_identification_number: data.identification.number,
+    mercado_libre_identification_type: data.identification.type,
+    mercado_libre_seller_experience: data.seller_experience,
+    mercado_libre_seller_reputation_transactions_total: data.seller_reputation.transactions.total,
+    mercado_libre_seller_reputation_transactions_completed: data.seller_reputation.transactions.completed,
+    mercado_libre_seller_reputation_transactions_canceled: data.seller_reputation.transactions.canceled,
+    mercado_libre_seller_reputation_ratings_positive: data.seller_reputation.ratings.positive,
+    mercado_libre_seller_reputation_ratings_negative: data.seller_reputation.ratings.negative,
+    mercado_libre_seller_reputation_ratings_neutral: data.seller_reputation.ratings.neutral,
+    mercado_libre_buyer_reputation_canceled_transactions: data.buyer_reputation.canceled_transactions,
+    mercado_libre_buyer_reputation_transactions_total: data.buyer_reputation.transactions.total,
+    mercado_libre_buyer_reputation_transactions_completed: data.buyer_reputation.transactions.completed,
+    mercado_libre_nickname: data.nickname,
+  }
+}
 
 async function saveTokensToDB(accessToken: string, refreshToken: string) {
   // Implementar la lógica para guardar los tokens en la base de datos

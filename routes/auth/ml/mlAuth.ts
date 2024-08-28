@@ -72,7 +72,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     );
 
     const { access_token } = tokenResponse.data;
-    console.log("access_token", access_token);
+    //console.log("access_token", access_token);
 
     // Obtiene la información del Usuario
     router.get("/user-info", async (req: Request, res: Response) => {
@@ -101,8 +101,9 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const userData = userResponse;
     console.log(userData.data);
+    const data = userData.data;
 
-    return res.status(200).send({ message: "User data fetched successfully" });
+    return res.status(200).send({ message: data });
   } catch (error: any) {
     console.error("Error:", error.response ? error.response.data : error.message);
     return res.status(500).send(error.response ? error.response.data : error.message);

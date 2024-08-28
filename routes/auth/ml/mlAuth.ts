@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import { Request, Response } from "express";
 import { GetMLEnv } from "../../../helpers/data/envData"
+import userDBB from "../../dbb/user";
 import qs from 'qs';
 
 const router = express.Router();
@@ -44,8 +45,8 @@ router.get("/login", async (req: Request, res: Response) => {
 // Callback de la autenticación que consultará Github
 router.get("/callback", async (req: Request, res: Response) => {
   const { code, state } = req.query;
-  console.log("worldid_email", state);
-  console.log("code", code);
+  //console.log("worldid_email", state);
+  //console.log("code", code);
 
   if (!code || !state) {
     return res.status(400).send("Code or state not found");
@@ -100,14 +101,12 @@ router.get("/callback", async (req: Request, res: Response) => {
     );
 
     const userData = userResponse;
-    console.log(userData.data);
+    //console.log(userData.data);
     const data = userData.data;
     const { email, seller_reputation } = data;
     console.log("email", email);
     console.log("seller_reputation", seller_reputation);
     
-    
-
     return res.status(200).send({ message: data });
   } catch (error: any) {
     console.error("Error:", error.response ? error.response.data : error.message);
@@ -115,21 +114,15 @@ router.get("/callback", async (req: Request, res: Response) => {
   }
 });
 
-
-async function getUserDataFromGithub(accessToken: string) {
-  // Implementar la lógica para obtener la información del usuario
+/*
+async function getInfoMLFromDBB(email: string){
   try {
-    const userResponse = await axios.get(
-      "https://api.github.com/user",
-      {
-        headers:
-          { Authorization: `token ${accessToken}` }
-      });
-    return userResponse.data;
-  } catch (error) {
-    throw error;
+    const response = await userDBB.getUserMLByEmail(email);
+  } catch (error: any) {
+    
   }
 }
+*/
 
 async function saveTokensToDB(accessToken: string, refreshToken: string) {
   // Implementar la lógica para guardar los tokens en la base de datos

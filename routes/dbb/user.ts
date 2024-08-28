@@ -100,6 +100,16 @@ const updateTokenWorldID = async (idUser: string, access_token: string, token_ty
 
 const getUser = async (email: string) => {
     try {
+        const result = await sql`SELECT * FROM MercadoLibre WHERE EMAIL = ${email};`;
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw new CustomError("Error getting MercadoLibre", 500);
+    }
+}
+
+const getUserMLByEmail = async (email: string) => { 
+    try {
         const result = await sql`SELECT * FROM Users WHERE EMAIL = ${email};`;
         return result;
     } catch (error) {
@@ -163,5 +173,6 @@ export default
         updateTokenGithub,
         updateTokenWorldID,
         getUserByEmail,
-        getGithubByUserId
+        getGithubByUserId,
+        getUserMLByEmail
     }; 

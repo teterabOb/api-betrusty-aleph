@@ -101,16 +101,22 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userData = userResponse;
     //console.log(userData.data);
     const data = userData.data;
+    
     const { email, seller_reputation } = data;
 
     // Obtener Info Usuario desde DBB
+    console.log("state", state);
+    
     const user = await userDBB.getUserByEmail(state.toString());
     console.log("user", user);
-    
 
+    if(user.rowCount == 0){ 
+      return res.status(400).send({ message: `Usuario con correo ${code} no encontrado` });
+    }
+    
+    const userML = await userDBB.getUserMLByEmail(email);
     //console.log("email", email);
     //console.log("seller_reputation", seller_reputation);
-    
     return res.status(200).send({ message: data });
   } catch (error: any) {
     console.error("Error:", error.response ? error.response.data : error.message);

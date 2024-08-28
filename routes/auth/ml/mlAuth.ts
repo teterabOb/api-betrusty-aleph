@@ -155,7 +155,5 @@ async function refreshAccessToken(refreshToken: string) {
   }
 }
 
-
-
 export default router;
 

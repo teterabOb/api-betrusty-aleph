@@ -82,15 +82,15 @@ const updateTokenGithub = async (id_user: string,
     refresh_token: string,
     refresh_token_expires_in: string,
     email: string,
-    data: Github) => {
+    data: string) => {
     try {
-        const jsonData = JSON.stringify(data)
+        //const jsonData = JSON.stringify(data)
         const result = await sql`UPDATE Github 
         SET ACCESS_TOKEN = ${accessToken}, 
         EXPIRES_IN = ${expires_in}, 
         REFRESH_TOKEN = ${refresh_token}, 
         REFRESH_TOKEN_EXPIRES_IN = ${refresh_token_expires_in},
-        DATA = ${jsonData}
+        DATA = ${data}
         WHERE EMAIL = ${email};`;
         return result
     } catch (error) {
@@ -117,9 +117,9 @@ const updateTokenWorldID = async (id_user: string, access_token: string, token_t
 
 const updateUserML = async (id_user: string, data: string) => {
     try {
-        const jsonData = JSON.stringify(data);
+        //const jsonData = JSON.stringify(data);
         const result = await sql`UPDATE MercadoLibre 
-        SET DATA = ${jsonData}
+        SET DATA = ${data}
         WHERE ID_USER = ${id_user};`;
         return result
     } catch (error) {

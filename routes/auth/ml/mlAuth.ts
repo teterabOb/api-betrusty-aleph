@@ -73,22 +73,10 @@ router.get("/callback", async (req: Request, res: Response) => {
     const { access_token } = tokenResponse.data;
     //console.log("access_token", access_token);
 
-    // Obtiene la información del Usuario
-    router.get("/user-info", async (req: Request, res: Response) => {
-      const { access_token } = req.query;
+    if (!access_token) {
+      return res.status(400).send("Access token not found");
+    }
 
-      if (!access_token) {
-        return res.status(400).send("Access token not found");
-      }
-
-      try {
-        const userResponse = await axios.get("https://api.mercadolibre.com/users/me", { headers: { Authorization: `token ${access_token}` } });
-        const userData = userResponse.data;
-        return res.status(200).send(userData);
-      } catch (error) {
-        return res.status(500).send({ error: error });
-      }
-    });
     const userResponse = await axios.get(
       "https://api.mercadolibre.com/users/me",
       {
@@ -101,19 +89,19 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userData = userResponse;
     //console.log(userData.data);
     const data = userData.data;
-    
+
     const { email, seller_reputation } = data;
 
     // Obtener Info Usuario desde DBB
     console.log("state", state);
-    
+
     const user = await userDBB.getUserByEmail(state.toString());
     console.log("user", user);
 
-    if(user.rowCount == 0){ 
+    if (user.rowCount == 0) {
       return res.status(400).send({ message: `Usuario con correo ${code} no encontrado` });
     }
-    
+
     const userML = await userDBB.getUserMLByEmail(email);
     //console.log("email", email);
     //console.log("seller_reputation", seller_reputation);
@@ -158,6 +146,22 @@ async function refreshAccessToken(refreshToken: string) {
 
   }
 }
+
+router.get("/user-info", async (req: Request, res: Response) => {
+  const { access_token } = req.query;
+
+  if (!access_token) {
+    return res.status(400).send("Access token not found");
+  }
+
+  try {
+    const userResponse = await axios.get("https://api.mercadolibre.com/users/me", { headers: { Authorization: `token ${access_token}` } });
+    const userData = userResponse.data;
+    return res.status(200).send(userData);
+  } catch (error) {
+    return res.status(500).send({ error: error });
+  }
+});
 
 export default router;
 

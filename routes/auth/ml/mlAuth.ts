@@ -102,8 +102,14 @@ router.get("/callback", async (req: Request, res: Response) => {
     //console.log(userData.data);
     const data = userData.data;
     const { email, seller_reputation } = data;
-    console.log("email", email);
-    console.log("seller_reputation", seller_reputation);
+
+    // Obtener Info Usuario desde DBB
+    const user = await userDBB.getUserByEmail(state.toString());
+    console.log("user", user);
+    
+
+    //console.log("email", email);
+    //console.log("seller_reputation", seller_reputation);
     
     return res.status(200).send({ message: data });
   } catch (error: any) {

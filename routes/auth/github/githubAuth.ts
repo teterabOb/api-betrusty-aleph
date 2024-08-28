@@ -24,10 +24,10 @@ router.get("/login", (req: Request, res: Response) => {
     return res.status(400).send({ message: "state custom value not found" });
   }
 
-  const baseUri = "https://github.com/login/oauth/authorize?client_id="
-  const clientId = ""
-  const redirectUri = ""
-  const finalUri = `${baseUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${worldid_email}`
+  const baseUri = "https://github.com/login/oauth/authorize"
+  //const clientId = ""
+  //const redirectUri = ""
+  const finalUri = `${baseUri}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&state=${worldid_email}`
   // Se agrego state al final de la URL, esto se enviará a Github y luego se devolverá en el callback
   const URL = finalUri
   //`https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback&state=${worldid_email}`;

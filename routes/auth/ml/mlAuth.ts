@@ -97,10 +97,10 @@ router.get("/callback", async (req: Request, res: Response) => {
       console.log("userData", userData);
 
       //return res.json(userData);
-    } catch (error) {
+    } catch (error: any) {
       console.log("ERROR");
-      console.log("error", error);
-      return res.status(500).send({ error: "Error obteniendo la info del usuario" });
+      const errorDescription = error.response.data || error;
+      return res.status(500).send(errorDescription);
     }
     //await saveTokensToDB(accessToken, refreshToken);
 

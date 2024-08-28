@@ -43,27 +43,24 @@ router.get("/login", async (req: Request, res: Response) => {
 
 // Callback de la autenticación que consultará Github
 router.get("/callback", async (req: Request, res: Response) => {
-  //console.log("ENTRAAA AL CALLBACK");
-
   const { code, state } = req.query;
   console.log("worldid_email", state);
   console.log("code", code);
 
-  if (code === "" || state === "") {
-    // Aqui tiene que redireccionar a una ruta de error
-    //return res.redirect("/error");
+  if (!code || !state) {
     return res.status(400).send("Code or state not found");
   }
 
   try {
+    // Obtener el token de acceso
     const tokenResponse = await axios.post(
       "https://api.mercadolibre.com/oauth/token",
       qs.stringify({
         grant_type: "authorization_code",
-        client_id: ML_CLIENT_ID,
-        client_secret: ML_CLIENT_SECRET,
+        client_id: process.env.ML_CLIENT_ID,
+        client_secret: process.env.ML_CLIENT_SECRET,
         code: code,
-        redirect_uri: ML_REDIRECT_URI,
+        redirect_uri: process.env.ML_REDIRECT_URI,
         code_verifier: state
       }),
       {
@@ -71,64 +68,47 @@ router.get("/callback", async (req: Request, res: Response) => {
           Accept: "application/json",
           "Content-Type": "application/x-www-form-urlencoded",
         },
-      })
+      }
+    );
 
     const { access_token } = tokenResponse.data;
-    //console.log("access_token", access_token);
-    
-    try {
-      const userResponse = await axios.get(
-        "https://api.mercadolibre.com/users/me",
-        {
-          headers: { 
-            Authorization: `Bearer ${access_token}` 
-          }
-        });
+    console.log("access_token", access_token);
 
-      const userData = userResponse.data;
-      //console.log("USER RESPONSE");
-      //console.log("userResponse", userResponse);
-      //console.log("USER DATA");
-      console.log("userData", userData);
+    // Obtiene la información del Usuario
+    router.get("/user-info", async (req: Request, res: Response) => {
+      const { access_token } = req.query;
 
-      //return res.json(userData);
-    } catch (error: any) {
-      //console.log("ERROR");
-      const errorDescription = error.response.data || error;
-      return res.status(500).send(errorDescription);
-    }
-    //await saveTokensToDB(accessToken, refreshToken);
+      if (!access_token) {
+        return res.status(400).send("Access token not found");
+      }
 
-    //console.log("access_token", tokenResponse.data);
-    //const baseUrl = `https://trusthub-ml.vercel.app/`
-    //const url = `${baseUrl}profile?access_token=${access_token}&email=${state}`;
+      try {
+        const userResponse = await axios.get("https://api.mercadolibre.com/users/me", { headers: { Authorization: `token ${access_token}` } });
+        const userData = userResponse.data;
+        return res.json(userData);
+      } catch (error) {
+        return res.status(500).send({ error: error });
+      }
+    });
+    const userResponse = await axios.get(
+      "https://api.mercadolibre.com/users/me",
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`
+        }
+      }
+    );
 
-    return res.status(200).send(tokenResponse);
-    //return res.redirect(`/user-info?access_token=${access_token}`);
-    //return res.redirect(`https://trusthub-ml.vercel.app?access_token=${access_token}&email=${state}`);
-  } catch (error: any) {
-    //const errorDescription = error.response.data || error;
-    return res.status(500).send(error);
-    //return res.status(500).send({ error: "Error al obtener la información de Github" });
-  }
-});
-
-// Obtiene la información del Usuario
-router.get("/user-info", async (req: Request, res: Response) => {
-  const { access_token } = req.query;
-
-  if (!access_token) {
-    return res.status(400).send("Access token not found");
-  }
-
-  try {
-    const userResponse = await axios.get("https://api.mercadolibre.com/users/me", { headers: { Authorization: `token ${access_token}` } });
     const userData = userResponse.data;
-    return res.json(userData);
-  } catch (error) {
-    return res.status(500).send({ error: error });
+    console.log("userData", userData);
+
+    return res.status(200).json(userData);
+  } catch (error: any) {
+    console.error("Error:", error.response ? error.response.data : error.message);
+    return res.status(500).send(error.response ? error.response.data : error.message);
   }
 });
+
 
 async function getUserDataFromGithub(accessToken: string) {
   // Implementar la lógica para obtener la información del usuario

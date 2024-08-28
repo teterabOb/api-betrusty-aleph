@@ -55,11 +55,6 @@ router.get("/callback", async (req: Request, res: Response) => {
     return res.status(400).send("Code or state not found");
   }
 
-  console.log("ML_CLIENT_ID", ML_CLIENT_ID);
-  console.log("ML_CLIENT_SECRET", ML_CLIENT_SECRET);
-  console.log("ML_REDIRECT_URI", ML_REDIRECT_URI);
-  console.log("code", code);
-
   try {
     const tokenResponse = await axios.post(
       "https://api.mercadolibre.com/oauth/token",
@@ -79,7 +74,7 @@ router.get("/callback", async (req: Request, res: Response) => {
       })
 
     const { access_token } = tokenResponse.data;
-    console.log("access_token", access_token);
+    //console.log("access_token", access_token);
     
     try {
       const userResponse = await axios.get(
@@ -91,20 +86,20 @@ router.get("/callback", async (req: Request, res: Response) => {
         });
 
       const userData = userResponse.data;
-      console.log("USER RESPONSE");
-      console.log("userResponse", userResponse);
-      console.log("USER DATA");
-      console.log("userData", userData);
+      //console.log("USER RESPONSE");
+      //console.log("userResponse", userResponse);
+      //console.log("USER DATA");
+      //console.log("userData", userData);
 
       //return res.json(userData);
     } catch (error: any) {
-      console.log("ERROR");
+      //console.log("ERROR");
       const errorDescription = error.response.data || error;
       return res.status(500).send(errorDescription);
     }
     //await saveTokensToDB(accessToken, refreshToken);
 
-    console.log("access_token", tokenResponse.data);
+    //console.log("access_token", tokenResponse.data);
     //const baseUrl = `https://trusthub-ml.vercel.app/`
     //const url = `${baseUrl}profile?access_token=${access_token}&email=${state}`;
 

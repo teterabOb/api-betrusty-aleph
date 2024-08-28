@@ -50,6 +50,9 @@ router.get("/callback", async (req: Request, res: Response) => {
     return res.status(400).send("Code or state not found");
   }
 
+  console.log("code", code);
+  console.log("state", state);
+  
   try {
     // Obtener el token de acceso
     const tokenResponse = await axios.post(
@@ -103,7 +106,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     const userML = await userDBB.getUserMLByEmail(email);
-    
+
     if(userML.rowCount == 0){ 
       //await userDBB.saveUserML(email, seller_reputation, state.toString());
     }

@@ -102,6 +102,11 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userData = userResponse;
     console.log(userData.data);
     const data = userData.data;
+    const { email, seller_reputation } = data;
+    console.log("email", email);
+    console.log("seller_reputation", seller_reputation);
+    
+    
 
     return res.status(200).send({ message: data });
   } catch (error: any) {

@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { Request, Response } from "express";
-import { type ISuccessResult } from '@worldcoin/idkit'
 import { GetWorldIDEnv } from "../../../helpers/data/envData";
 import { GetWebEnv } from "../../../helpers/data/envData";
+import { type ISuccessResult } from '@worldcoin/idkit'
 import userDBB from "../../dbb/user";
 import axios from 'axios';
 import qs from 'qs';

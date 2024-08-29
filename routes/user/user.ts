@@ -126,7 +126,7 @@ router.get("/all", async (req: Request, res: Response) => {
             };
         }
 
-        return res.status(200).send(userProfile);
+        return res.status(200).send({ message: userProfile});
     } catch (error) {
         return res.status(500).send({ message: error });
     }

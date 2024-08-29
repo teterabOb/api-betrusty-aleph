@@ -135,7 +135,7 @@ router.get("/callback", async (req: Request, res: Response) => {
         if (idUser === "") return res.status(400).send("IdUser is blank")
 
         const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
-        const url = `${baseUrl}id_user=${idUser.toString()}&email=${userEmail}`;
+        const url = `${baseUrl}?id_user=${idUser.toString()}&email=${userEmail}`;
         return res.redirect(url);
     } catch (error: any) {
         console.log(`error callback wc : ${error.response.data}`)

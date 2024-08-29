@@ -1,4 +1,5 @@
 export interface MercadoLibre {
+    reputation_level?: string,
     mercado_libre_first_name: string;
     mercado_libre_last_name: string;
     mercado_libre_email: string;

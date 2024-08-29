@@ -84,7 +84,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
-    const url = `${baseUrl}profile?id_user=${idUserString}&email=${emailInput}`;
+    const url = `${baseUrl}?id_user=${idUserString}&email=${emailInput}`;
     return res.redirect(url);
   } catch (error: any) {
     //return res.redirect("https://trusthub-ml.vercel.app?error=true");

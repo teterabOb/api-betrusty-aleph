@@ -119,7 +119,6 @@ router.get("/callback", async (req: Request, res: Response) => {
     const objectMercadoLibre: MercadoLibre = GenerateMercadoLibreJSON(data);
     const jsonMercadoLibre = JSON.stringify(objectMercadoLibre);
 
-
     const { email } = data;
 
     const user = await userDBB.getAllDataUserByEmail(worldid_email.toString());
@@ -134,7 +133,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userML = await userDBB.getUserMLIdUser(id_user.toString());
 
     if (userML.rowCount == 0) {
-      await userDBB.saveUserML(id_user, did_user, jsonMercadoLibre, state.toString());
+      await userDBB.saveUserML(id_user, did_user, jsonMercadoLibre, worldid_email.toString());
     } else {
       await userDBB.updateUserML(id_user, jsonMercadoLibre);
     }

@@ -190,14 +190,13 @@ const saveUser = async (did: string, name: string = "anon", email: string) => {
 
 const saveUserML = async (id_user: string, did: string, data: string, email: string) => {
     try {
-        const jsonData = JSON.stringify(data);
         const result = await sql`INSERT INTO 
         MercadoLibre( 
         ID_USER, 
         DID, 
         DATA, 
         EMAIL)
-        VALUES(${id_user}, ${did}, ${jsonData}, ${email});`;
+        VALUES(${id_user}, ${did}, ${data}, ${email});`;
         return result
     } catch (error) {
         console.log(error);

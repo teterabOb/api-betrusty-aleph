@@ -123,20 +123,16 @@ router.get("/callback", async (req: Request, res: Response) => {
                     id_token);
         }
 
-        // Retornamos el mensaje de usuario verificado
-        // *************************************
-        // AQUI REDIRIGIR A LA PAGINA DE LA APP
-        // *************************************
         const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
-        const url = `${baseUrl}profile?access_token=${access_token}&email=${userEmail}`;
+        const url = `${baseUrl}profile?id_user=${idUser.toString()}&email=${userEmail}`;
         return res.redirect(url);
     } catch (error: any) {
-        const errorDescription = error.response.data || error;
-        return res.redirect(`${baseUrl}error?error=${errorDescription.error_description}`);
+        console.log(`error callback wc : ${error.response.data}`)
+        //const errorDescription = error.response.data || error;
+        //return res.redirect(`${baseUrl}error?error=${errorDescription.error_description}`);
+        return res.redirect(`${baseUrl}error?message=${`Hubo un problema con la autenticación, Favor intenta nuevamente.`}`);
     }
 });
-
-// User Info
 
 // Para crear el Token se debe ecodear el client_id y el client_secret en base64
 router.get("/get-user-info", async (req: Request, res: Response) => {
@@ -163,7 +159,7 @@ const getUserInfo = async (access_token: string, token_type: string) => {
         //console.log("requestGetUserInfo", requestGetUserInfo.data.email);
         userEmail = requestGetUserInfo.data.email;
     } catch (error) {
-        //console.log("error", error);
+        console.log("getUserInfo", error);
         throw new Error("Error fetching user data from WorldID");
     } finally {
         return userEmail;

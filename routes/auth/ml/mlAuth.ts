@@ -122,10 +122,10 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const { email } = data;
 
-    const user = await userDBB.getAllDataUserByEmail(state.toString());
+    const user = await userDBB.getAllDataUserByEmail(worldid_email.toString());
 
     if (user.rowCount == 0) {
-      return res.status(400).send({ message: `Usuario con correo ${code} no encontrado` });
+      return res.status(400).send({ message: `Usuario con correo ${worldid_email} no encontrado` });
     }
 
     const id_user = user.rows[0].id_user;

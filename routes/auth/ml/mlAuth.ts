@@ -20,12 +20,13 @@ const {
 
 const { WEB_URL } = GetWebEnv();
 
+
 // Punto de entrada para generar el Token de autenticación
 router.get("/login", async (req: Request, res: Response) => {
-  const { worldid_email, country_code } = req.query;
+  let { worldid_email, country_code } = req.query;
 
-  if (!worldid_email) {
-    return res.status(400).send("state custom value not found");
+  if (!worldid_email && !country_code) {
+    return res.status(400).send("state custom value or email not sent");
   }
 
   let countryCode = "";
@@ -34,9 +35,12 @@ router.get("/login", async (req: Request, res: Response) => {
   if (country_code == "CL") {
     countryCode = ".cl";
     clientId = ML_CLIENT_ID_CL;
+    worldid_email = (worldid_email + country_code);
+
   } else if (country_code == "AR") {
     countryCode = ".com.ar";
     clientId = ML_CLIENT_ID_AR;
+    worldid_email = (worldid_email + country_code);
   }
 
   // Ejemplo Request
@@ -58,16 +62,33 @@ router.get("/callback", async (req: Request, res: Response) => {
     return res.status(400).send("Code or state not found");
   }
 
+  const country_code = state.toString().slice(-2)
+  const worldid_email = state.toString().slice(0, -2);
+
+  let clientId;
+  let clientSecret;
+  let redirectUri;
+
+  if(country_code == "CL"){
+    clientId = ML_CLIENT_ID_CL;
+    clientSecret = ML_CLIENT_SECRET_CL;
+    redirectUri = ML_REDIRECT_URI_CL;
+  }else if(country_code == "AR"){ 
+    clientId = ML_CLIENT_ID_AR;
+    clientSecret = ML_CLIENT_SECRET_AR;
+    redirectUri = ML_REDIRECT_URI_AR;
+  }
+
   try {
     // Obtener el token de acceso
     const tokenResponse = await axios.post(
       "https://api.mercadolibre.com/oauth/token",
       qs.stringify({
         grant_type: "authorization_code",
-        client_id: process.env.ML_CLIENT_ID,
-        client_secret: process.env.ML_CLIENT_SECRET,
+        client_id: clientId,
+        client_secret: clientSecret,
         code: code,
-        redirect_uri: process.env.ML_REDIRECT_URI,
+        redirect_uri: redirectUri,
         code_verifier: state
       }),
       {
@@ -95,10 +116,10 @@ router.get("/callback", async (req: Request, res: Response) => {
 
     const userData = userResponse;
     const data = userData.data;
-    const objectMercadoLibre: MercadoLibre =  GenerateMercadoLibreJSON(data);
+    const objectMercadoLibre: MercadoLibre = GenerateMercadoLibreJSON(data);
     const jsonMercadoLibre = JSON.stringify(objectMercadoLibre);
-    
-    
+
+
     const { email } = data;
 
     const user = await userDBB.getAllDataUserByEmail(state.toString());
@@ -113,14 +134,14 @@ router.get("/callback", async (req: Request, res: Response) => {
     const userML = await userDBB.getUserMLIdUser(id_user.toString());
 
     if (userML.rowCount == 0) {
-      await userDBB.saveUserML(id_user, did_user, jsonMercadoLibre, state.toString() );
+      await userDBB.saveUserML(id_user, did_user, jsonMercadoLibre, state.toString());
     } else {
       await userDBB.updateUserML(id_user, jsonMercadoLibre);
     }
 
     const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
     const url = `${baseUrl}profile?id_user=${id_user}&email=${email}`;
-    return res.redirect(url); 
+    return res.redirect(url);
   } catch (error: any) {
     console.error("Error:", error.response ? error.response.data : error.message);
     return res.status(500).send(error.response ? error.response.data : error.message);

@@ -112,6 +112,13 @@ router.get("/callback", async (req: Request, res: Response) => {
                     userEmail
                 );
         } else {
+            const user = await userDBB.getUserByEmail(userEmail);
+
+            if (user.rowCount === 0) {
+                return res.status(400).send({ message: "Error Getting user from DB" });
+            }
+
+            idUser = user.rows[0].id_user;
             // No retorna nada, luego se puede borrar, si falla cae al catch
             const updateTokensWID =
                 await userDBB.updateTokenWorldID(
@@ -125,8 +132,8 @@ router.get("/callback", async (req: Request, res: Response) => {
 
         console.log("id user : ", idUser);
 
-        if(idUser === "") return res.status(400).send("IdUser is blank")
-        
+        if (idUser === "") return res.status(400).send("IdUser is blank")
+
         const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
         const url = `${baseUrl}id_user=${idUser.toString()}&email=${userEmail}`;
         return res.redirect(url);

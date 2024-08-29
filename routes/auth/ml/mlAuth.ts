@@ -10,9 +10,12 @@ import qs from 'qs';
 const router = express.Router();
 
 const {
-  ML_CLIENT_ID,
-  ML_CLIENT_SECRET,
-  ML_REDIRECT_URI
+  ML_CLIENT_ID_CL,
+  ML_CLIENT_SECRET_CL,
+  ML_REDIRECT_URI_CL,
+  ML_CLIENT_ID_AR,
+  ML_CLIENT_SECRET_AR,
+  ML_REDIRECT_URI_AR
 } = GetMLEnv();
 
 const { WEB_URL } = GetWebEnv();
@@ -26,13 +29,14 @@ router.get("/login", async (req: Request, res: Response) => {
   }
 
   let countryCode = "";
+  let clientId = "";
 
   if (country_code == "CL") {
     countryCode = ".cl";
+    clientId = ML_CLIENT_ID_CL;
   } else if (country_code == "AR") {
     countryCode = ".com.ar";
-  } else {
-    countryCode = ".cl";
+    clientId = ML_CLIENT_ID_AR;
   }
 
   // Ejemplo Request
@@ -42,7 +46,7 @@ router.get("/login", async (req: Request, res: Response) => {
   //https://api-betrusty.vercel.app/ml/login?worldid_email=0x2a06572cd2ac0543130e4f6d42b53dc5d4a139d39967acdefc6138ad4553ccae@id.worldcoin.org&country_code=CL
 
   const mlAuthUrl = `https://auth.mercadolibre${countryCode}/authorization?`
-  const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${ML_CLIENT_ID}&state=${worldid_email}&redirect_uri=${ML_REDIRECT_URI}`;
+  const finalUrlMl = `${mlAuthUrl}response_type=code&client_id=${clientId}&state=${worldid_email}&redirect_uri=${ML_REDIRECT_URI_CL}`;
   return res.redirect(finalUrlMl);
 });
 
@@ -165,6 +169,7 @@ async function saveTokensToDB(accessToken: string, refreshToken: string) {
   // Implementar la lógica para guardar los tokens en la base de datos
 }
 
+/*
 async function refreshAccessToken(refreshToken: string) {
   // Implementar la lógica para refrescar el token de acceso
   try {
@@ -185,6 +190,7 @@ async function refreshAccessToken(refreshToken: string) {
 
   }
 }
+  */
 
 export default router;
 

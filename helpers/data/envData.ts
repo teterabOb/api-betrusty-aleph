@@ -19,9 +19,12 @@ export interface WorldIDEnv {
 }
 
 export interface MLEnv {
-    ML_CLIENT_ID: string;
-    ML_CLIENT_SECRET: string;
-    ML_REDIRECT_URI: string;
+    ML_CLIENT_ID_CL: string;
+    ML_CLIENT_SECRET_CL: string;
+    ML_REDIRECT_URI_CL: string;
+    ML_CLIENT_ID_AR: string;
+    ML_CLIENT_SECRET_AR: string;
+    ML_REDIRECT_URI_AR: string;
 }
 
 export interface GitHubEnv {
@@ -56,9 +59,12 @@ export const GetGitHubEnv = () => {
 
 export const GetMLEnv = () => { 
     const mlEnvData: MLEnv = {
-        ML_CLIENT_ID: process.env.ML_CLIENT_ID || "",
-        ML_CLIENT_SECRET: process.env.ML_CLIENT_SECRET || "",
-        ML_REDIRECT_URI: process.env.ML_REDIRECT_URI || ""
+        ML_CLIENT_ID_CL: process.env.ML_CLIENT_ID_CL || "",
+        ML_CLIENT_SECRET_CL: process.env.ML_CLIENT_SECRET_CL || "",
+        ML_REDIRECT_URI_CL: process.env.ML_REDIRECT_URI_CL || "",
+        ML_CLIENT_ID_AR: process.env.ML_CLIENT_ID_AR || "",
+        ML_CLIENT_SECRET_AR: process.env.ML_CLIENT_SECRET_AR || "",
+        ML_REDIRECT_URI_AR: process.env.ML_REDIRECT_URI_AR || ""
     }
     return mlEnvData;
 }

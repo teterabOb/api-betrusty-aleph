@@ -2,8 +2,9 @@ import express from "express";
 import axios from "axios";
 import { Request, Response } from "express";
 import { GetMLEnv } from "../../../helpers/data/envData"
-import userDBB from "../../dbb/user";
+import { GetWebEnv } from "../../../helpers/data/envData";
 import { MercadoLibre } from "../../../interfaces/MercadoLibre";
+import userDBB from "../../dbb/user";
 import qs from 'qs';
 
 const router = express.Router();
@@ -13,6 +14,8 @@ const {
   ML_CLIENT_SECRET,
   ML_REDIRECT_URI
 } = GetMLEnv();
+
+const { WEB_URL } = GetWebEnv();
 
 // Punto de entrada para generar el Token de autenticación
 router.get("/login", async (req: Request, res: Response) => {
@@ -111,10 +114,9 @@ router.get("/callback", async (req: Request, res: Response) => {
       await userDBB.updateUserML(id_user, jsonMercadoLibre);
     }
 
-    const baseUrl = `https://trusthub-ml.vercel.app/`
+    const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
     const url = `${baseUrl}profile?id_user=${id_user}&email=${email}`;
-    return res.redirect(url);
-    //return res.status(200).send({ message: data });
+    return res.redirect(url); 
   } catch (error: any) {
     console.error("Error:", error.response ? error.response.data : error.message);
     return res.status(500).send(error.response ? error.response.data : error.message);

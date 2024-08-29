@@ -1,7 +1,9 @@
 import axios, { AxiosResponse } from "axios";
 import express, { Request, Response } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
+import { GetWebEnv } from "../../../helpers/data/envData";
 import { Github } from "../../../interfaces/Github";
+
 import userDBB from "../../dbb/user";
 
 interface TokenResponse {
@@ -11,6 +13,7 @@ interface TokenResponse {
   refresh_token_expires_in: number;
 }
 
+const { WEB_URL } = GetWebEnv();
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
 const app = express();
@@ -64,8 +67,7 @@ router.get("/callback", async (req: Request, res: Response) => {
     }
 
     const idUser = await userDBB.getUserByEmail(emailInput);
-    //console.log("idUser", idUser);
-
+    
     if (idUser.rowCount === 0) {
       return res.status(400).send("User not found in Trusthub");
     }
@@ -81,7 +83,7 @@ router.get("/callback", async (req: Request, res: Response) => {
       await userDBB.saveTokens(idUserString, did, access_token, expires_in, refresh_token, refresh_token_expires_in, email, jsonGithub);
     }
 
-    const baseUrl = `https://trusthub-ml.vercel.app/`
+    const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
     const url = `${baseUrl}profile?access_token=${access_token}&email=${emailInput}`;
     return res.redirect(url);
   } catch (error) {

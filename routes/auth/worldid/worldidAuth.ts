@@ -2,17 +2,19 @@ import { Router } from "express";
 import { Request, Response } from "express";
 import { type ISuccessResult } from '@worldcoin/idkit'
 import { GetWorldIDEnv } from "../../../helpers/data/envData";
+import { GetWebEnv } from "../../../helpers/data/envData";
 import userDBB from "../../dbb/user";
 import axios from 'axios';
 import qs from 'qs';
 
 const router = Router();
 
+const { WEB_URL } = GetWebEnv();
 const { WORLD_ID,
     WORLD_SECRET,
     WORLD_REDIRECT_URI,
     WORLDID_TOKEN_URL,
-    WORLDID_BASIC_TOKEN  } = GetWorldIDEnv();
+    WORLDID_BASIC_TOKEN } = GetWorldIDEnv();
 
 // Endpoint to validate Action
 router.get("/validate-api", async (req: Request, res: Response) => {
@@ -45,7 +47,7 @@ router.get("/", async (req: Request, res: Response) => {
 router.get("/callback", async (req: Request, res: Response) => {
     const endpoint = "https://id.worldcoin.org/token"
     const code = req.query.code;
-    const baseUrl = `https://trusthub-ml.vercel.app/`
+    const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
 
     const grant_type = "authorization_code"
     const redirect_uri = WORLD_REDIRECT_URI;
@@ -125,7 +127,7 @@ router.get("/callback", async (req: Request, res: Response) => {
         // *************************************
         // AQUI REDIRIGIR A LA PAGINA DE LA APP
         // *************************************
-        const baseUrl = `https://trusthub-ml.vercel.app/`
+        const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
         const url = `${baseUrl}profile?access_token=${access_token}&email=${userEmail}`;
         return res.redirect(url);
     } catch (error: any) {

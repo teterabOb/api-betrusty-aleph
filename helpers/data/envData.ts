@@ -30,6 +30,10 @@ export interface GitHubEnv {
     REDIRECT_URI: string;
 }
 
+export interface WebEnv { 
+    WEB_URL: string;
+}
+
 export const GetWorldIDEnv = () => {
     const worldIDEnvData: WorldIDEnv = {
         WORLD_ID: process.env.WORLDID_APP_ID || "",
@@ -69,4 +73,11 @@ export const getEnvData = () => {
         MarketplaceContractAddress: process.env.MARKETPLACE_CONTRACT_ADDRESS || ""
     }
     return envData
+}
+
+export const GetWebEnv = () => { 
+    const webEnvData: WebEnv = {
+        WEB_URL: process.env.WEB_URL || ""
+    }
+    return webEnvData;
 }

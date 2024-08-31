@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { GetMLEnv } from "../../../helpers/data/envData"
 import { GetWebEnv } from "../../../helpers/data/envData";
 import { MercadoLibre } from "../../../interfaces/MercadoLibre";
-import userDBB from "../../dbb/user";
+import userDBB from "../../../data/user";
 import qs from 'qs';
 
 const router = express.Router();

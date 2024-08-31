@@ -4,7 +4,7 @@ import { GetGitHubEnv } from "../../../helpers/data/envData"
 import { GetWebEnv } from "../../../helpers/data/envData";
 import { Github } from "../../../interfaces/Github";
 
-import userDBB from "../../dbb/user";
+import userDBB from "../../../data/user";
 
 interface TokenResponse {
   access_token: string;

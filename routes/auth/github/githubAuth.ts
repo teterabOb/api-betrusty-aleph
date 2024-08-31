@@ -1,7 +1,10 @@
 import axios, { AxiosResponse } from "axios";
-import { Request, Response, Router } from "express";
+import express, { Request, Response } from "express";
 import { GetGitHubEnv } from "../../../helpers/data/envData"
-import userDBB from "../../dbb/user";
+import { GetWebEnv } from "../../../helpers/data/envData";
+import { Github } from "../../../interfaces/Github";
+
+import userDBB from "../../../data/user";
 
 interface TokenResponse {
   access_token: string;
@@ -10,24 +13,28 @@ interface TokenResponse {
   refresh_token_expires_in: number;
 }
 
+const { WEB_URL } = GetWebEnv();
 const { CLIENT_ID, CLIENT_SECRET, REDIRECT_URI } = GetGitHubEnv();
 
-const router = Router();
+const app = express();
+app.use(express.json());
+const router = express.Router();
 
-// Se debe enviar worldid_email en el body
+// Se debe enviar `worldid_email` en la url
 router.get("/login", (req: Request, res: Response) => {
-  const { worldid_email } = req.body
+  const { worldid_email } = req.query
 
   if (!worldid_email) {
-    return res.status(400).send({ message: "worldid_email not found" });
+    return res.status(400).send({ message: "state custom value not found" });
   }
 
-  const baseUri = "https://github.com/login/oauth/authorize?client_id="
-  const clientId = ""
-  const redirectUri = ""
-  const finalUri = `${baseUri}?client_id=${clientId}&redirect_uri=${redirectUri}&state=${worldid_email}`
+  const baseUri = "https://github.com/login/oauth/authorize"
+  //const clientId = ""
+  //const redirectUri = ""
+  const finalUri = `${baseUri}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&state=${worldid_email}`
   // Se agrego state al final de la URL, esto se enviará a Github y luego se devolverá en el callback
-  const URL = `https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback&state=${worldid_email}`;
+  const URL = finalUri
+  //`https://github.com/login/oauth/authorize?client_id=Iv23liSHZg3lbRlkRrAu&redirect_uri=https://api-betrusty.vercel.app/github/callback&state=${worldid_email}`;
   return res.redirect(URL);
 });
 
@@ -35,46 +42,53 @@ router.get("/callback", async (req: Request, res: Response) => {
   const { code, state } = req.query;
   console.log("worldid_email", state);
 
-  if (!code) {
-    return res.status(400).send("Code not found");
+  if (!code || !state) {
+    // Aquí tiene que redireccionar a una ruta de error
+    //return res.redirect("https://trusthub-ml.vercel.app/error");
+    res.status(400).send("Code or state not found");
   }
 
-  
   try {
+    let emailInput = state as string;
+    let did = "did1";
     // Obtenemos el token
     const tokenResponse = await getTokenFromGithub(code as string);
     const { access_token, expires_in, refresh_token, refresh_token_expires_in } = tokenResponse;
 
-    // Validamos si el usuario ya existe en la base de datos
-    // Este ID debemos obtenerlo con el DID
-    // Cuando el usuario inicia sesion guardaremos data 
-    // En todas las tablas para asegurar el DID y el ID_USER
-    const userDataFromDBB = await userDBB.getUser("1");
-
-    if (userDataFromDBB.rowCount === 0) {
-      await userDBB.saveUser("did1", "test name", "test email");
-    }
-
     const userDataFromGithub = await getUserDataFromGithub(access_token);
+    //console.log("userDataFromGithub", userDataFromGithub);
+    const objectGithub: Github = GenerateGithubJSON(userDataFromGithub)
+    const jsonGithub = JSON.stringify(objectGithub);
+
     const email = userDataFromGithub.email;
 
     if (!email) {
-      return res.status(400).send("Email not found");
+      return res.status(400).send("Email not found in Github");
     }
 
-    const githubInfoDBB: any = await userDBB.getGithubByEmail(email);
+    const idUser = await userDBB.getUserByEmail(emailInput);
+    
+    if (idUser.rowCount === 0) {
+      return res.status(400).send("User not found in Trusthub");
+    }
+
+    // Hay que modificar aqui y obtener el Id del Usuario y el DID
+    const idUserString = idUser.rows[0].id_user;
+
+    const githubInfoDBB: any = await userDBB.getGithubByUserId(idUserString);
 
     if (githubInfoDBB.rowCount > 0) {
-      await userDBB.updateTokenGithub(githubInfoDBB.rows[0].id_user, access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.updateTokenGithub(idUserString, access_token, expires_in, refresh_token, refresh_token_expires_in, email, jsonGithub);
     } else {
-      await userDBB.saveTokens("1", access_token, expires_in, refresh_token, refresh_token_expires_in, email);
+      await userDBB.saveTokens(idUserString, did, access_token, expires_in, refresh_token, refresh_token_expires_in, email, jsonGithub);
     }
 
-    //return res.status(200).json({ message: "Github verified", token_response: tokenResponse });
-    return res.status(200).send({ code: code, worldid_email: state });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).send({ message: `Internal Server Error ${error}` });
+    const baseUrl = WEB_URL//`https://trusthub-ml.vercel.app/`
+    const url = `${baseUrl}?id_user=${idUserString}&email=${emailInput}`;
+    return res.redirect(url);
+  } catch (error: any) {
+    //return res.redirect("https://trusthub-ml.vercel.app?error=true");
+    return res.redirect(`${WEB_URL}error?message=${`Hubo un problema con la autenticación, Favor intenta nuevamente.`}`);
   }
 });
 
@@ -101,6 +115,18 @@ async function getTokenFromGithub(code: string) {
   } catch (error) {
     console.error("Error fetching access token:", error);
     throw new Error("Failed to fetch access token");
+  }
+}
+
+function GenerateGithubJSON(data: any): Github {
+  return {
+    github_login: data.login,
+    github_public_repos: data.public_repos,
+    github_public_gists: data.public_gists,
+    github_followers: data.followers,
+    github_following: data.following,
+    github_created_at: data.created_at,
+    github_collaborators: data.collaborators,
   }
 }
 

@@ -42,7 +42,7 @@ export async function getAuthUrl(): Promise<string> {
     return `${world_id_endpoint}?response_type=${response_type}&redirect_uri=${redirect_uri}&scope=${scope}&client_id=${client_id}`;
 }
 
-export async function handleCallback(code: string): Promise<{ idUser: string, userEmail: string }> {
+export async function handleCallback(code: string, state: string): Promise<{ idUser: string, userEmail: string }> {
     const endpoint = "https://id.worldcoin.org/token";
     const grant_type = "authorization_code";
     const redirect_uri = WORLD_REDIRECT_URI;

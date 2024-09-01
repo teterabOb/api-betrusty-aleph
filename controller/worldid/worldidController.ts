@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { getAuthUrl, handleCallback, verifyProofBackEnd } from "../../services/worldid/worldid";
-import { ISuccessResult } from '@worldcoin/idkit';
 
 export async function DefaultFunction(req: Request, res: Response) {
     try {
@@ -20,7 +19,8 @@ export async function Callback(req: Request, res: Response) {
     }
 
     try {
-        const { idUser, userEmail } = await handleCallback(code);
+        // state instead of code
+        const { idUser, userEmail } = await handleCallback(code, code);
         const url = `${baseUrl}?id_user=${idUser}&email=${userEmail}`;
         return res.redirect(url);
     } catch (error: any) {
